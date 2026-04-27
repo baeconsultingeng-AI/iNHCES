@@ -1,0 +1,51 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.env
+
+# ML artefacts
+05_ml_models/models/*.pkl
+05_ml_models/models/*.joblib
+05_ml_models/models/*.bin
+05_ml_models/data/raw/*.csv
+05_ml_models/data/processed/*.csv
+
+# Large data files
+02_macro_analysis/data/raw/*.csv
+02_macro_analysis/data/processed/*.csv
+02_macro_analysis/results/*.csv
+02_macro_analysis/shap_results/*.csv
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs
+.vscode/settings.json
+.idea/
+
+# Node / Next.js
+nhces-frontend/node_modules/
+nhces-frontend/.next/
+nhces-frontend/.vercel/
+
+# Keep .env.example files
+!nhces-backend/.env.example

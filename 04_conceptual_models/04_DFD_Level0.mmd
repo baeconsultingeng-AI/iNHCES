@@ -1,0 +1,49 @@
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#0F2850', 'primaryTextColor': '#FFFFFF', 'primaryBorderColor': '#B48C1E', 'lineColor': '#555555', 'secondaryColor': '#DCE6F5', 'tertiaryColor': '#F5F5F5'}}}%%
+
+%% =============================================================================
+%% iNHCES DATA FLOW DIAGRAM — LEVEL 0 (CONTEXT DIAGRAM)
+%% Shows iNHCES as a single process with all external entities and data flows.
+%% Render at: mermaid.live  OR  VS Code Mermaid Preview extension
+%% TETFund NRF 2025 | Department of Quantity Surveying, ABU Zaria
+%% =============================================================================
+
+graph TD
+
+    %% ── EXTERNAL ENTITIES (Users) ────────────────────────────────────────
+    QS["QS PROFESSIONAL\n(Primary User)"]
+    RES["RESEARCHER / PI\n(Secondary User)"]
+    ADM["SYSTEM ADMIN\n(Operations)"]
+
+    %% ── EXTERNAL ENTITIES (Data Sources) ─────────────────────────────────
+    WB["WORLD BANK\nOpen Data API"]
+    EIA["EIA API\n(Brent Crude)"]
+    CBN["FRED / CBN API\n(FX Rates)"]
+    PROP["PROPERTYPRO +\nPRIVATE PROPERTY\n(Scrapers)"]
+    BIZ["BUSINESSDAY +\nJIJI.NG\n(Scrapers)"]
+    NNPC["NNPC / NMDPRA\n(PMS Prices)"]
+    NIQS_EXT["NIQS\n(Manual Upload)"]
+    GH["GITHUB\n(CI/CD Trigger)"]
+
+    %% ── THE SYSTEM (Single Black Box) ────────────────────────────────────
+    SYS(["  0\n  iNHCES\n  Intelligent National\n  Housing Cost\n  Estimating System  "])
+
+    %% ── USER → SYSTEM DATA FLOWS ─────────────────────────────────────────
+    QS    -->|"Project details\n(building type, area,\nlocation, type)"| SYS
+    SYS   -->|"Cost estimate (NGN/sqm)\nConfidence interval\nSHAP explanation\nPDF report"| QS
+
+    RES   -->|"Analysis queries\nData export requests\nModel performance review"| SYS
+    SYS   -->|"Aggregated project data\nMacro data series\nModel metrics"| RES
+
+    ADM   -->|"User management\nModel promotion command\nManual pipeline trigger\nNIQS CSV upload"| SYS
+    SYS   -->|"System status\nPipeline health\nAudit log\nUser list"| ADM
+
+    %% ── DATA SOURCES → SYSTEM ────────────────────────────────────────────
+    WB    -->|"GDP growth (%)\nCPI inflation (%)\nLending rate (%)\n[Annual]"| SYS
+    EIA   -->|"Brent crude price\n(USD/barrel)\n[Annual/Monthly]"| SYS
+    CBN   -->|"NGN/USD, NGN/EUR,\nNGN/GBP exchange rates\n[Daily]"| SYS
+    PROP  -->|"Property listing prices\n(NGN/sqm by zone)\n[Weekly]"| SYS
+    BIZ   -->|"Cement prices by\nbrand and region\nIron rod prices\n[Weekly]"| SYS
+    NNPC  -->|"PMS pump price\nby state\n[Monthly]"| SYS
+    NIQS_EXT -->|"Unit rates by trade\nand building type\n[Quarterly - manual]"| SYS
+    GH    -->|"Code push to main\n(deploy trigger)"| SYS
+    SYS   -->|"Build status\nDeployment confirmation"| GH

@@ -1,0 +1,84 @@
+# iNHCES Backend — railway.toml
+# Railway deployment configuration for the FastAPI backend service.
+# Docs: https://docs.railway.app/reference/config-as-code
+# TETFund NRF 2025 | Department of Quantity Surveying, ABU Zaria
+
+[build]
+builder          = "DOCKERFILE"
+dockerfilePath   = "nhces-backend/Dockerfile"
+# Build context is the repo root so that railway.toml and nhces-backend/ are
+# both visible during the Docker build.
+
+[deploy]
+# Public domain alias (configure in Railway dashboard → Settings → Networking)
+# The frontend vercel.json rewrites /api/* to https://nhces-api.up.railway.app/*
+startCommand   = "python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --log-level info --access-log"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType  = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+# Railway sets $PORT automatically; Uvicorn reads it from the start command above.
+# Never hard-code 8000 here — Railway may assign a different port.
+
+[[deploy.envVars]]
+# Required secrets — set these in the Railway dashboard under Variables.
+# These are NAMES only; values are never stored in source control.
+name = "SUPABASE_URL"
+description = "https://<project>.supabase.co"
+
+[[deploy.envVars]]
+name = "SUPABASE_ANON_KEY"
+description = "Supabase anon/public key"
+
+[[deploy.envVars]]
+name = "SUPABASE_SERVICE_KEY"
+description = "Supabase service_role key (never expose to frontend)"
+
+[[deploy.envVars]]
+name = "SUPABASE_JWT_SECRET"
+description = "JWT signing secret from Supabase Auth settings"
+
+[[deploy.envVars]]
+name = "CLOUDFLARE_R2_ENDPOINT"
+description = "https://<account>.r2.cloudflarestorage.com"
+
+[[deploy.envVars]]
+name = "CLOUDFLARE_R2_ACCESS_KEY"
+description = "R2 S3-compatible access key ID"
+
+[[deploy.envVars]]
+name = "CLOUDFLARE_R2_SECRET_KEY"
+description = "R2 S3-compatible secret access key"
+
+[[deploy.envVars]]
+name = "CLOUDFLARE_R2_BUCKET"
+description = "R2 bucket name (default: nhces-storage)"
+
+[[deploy.envVars]]
+name = "MLFLOW_TRACKING_URI"
+description = "http://<mlflow-railway-service>:5000"
+
+[[deploy.envVars]]
+name = "AIRFLOW_API_URL"
+description = "http://<airflow-railway-service>:8080/api/v1"
+
+[[deploy.envVars]]
+name = "AIRFLOW_USERNAME"
+description = "Airflow REST API user"
+
+[[deploy.envVars]]
+name = "AIRFLOW_PASSWORD"
+description = "Airflow REST API password (use Railway secret)"
+
+[[deploy.envVars]]
+name = "SECRET_KEY"
+description = "App-level secret key (use a strong random value in production)"
+
+[[deploy.envVars]]
+name = "ENVIRONMENT"
+description = "production"
+
+[[deploy.envVars]]
+name = "ALLOWED_ORIGINS"
+description = "https://nhces.vercel.app,https://nhces-api.up.railway.app"

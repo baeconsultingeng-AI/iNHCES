@@ -1,0 +1,79 @@
+%%{init: {'theme': 'base'}}%%
+
+%% =============================================================================
+%% iNHCES USER JOURNEY MAP
+%% Primary persona: QS Professional requesting a housing cost estimate.
+%% Secondary persona: Researcher reviewing macro data and model performance.
+%% Scale: 1 (very poor) to 5 (excellent) — satisfaction score per touchpoint.
+%% Render at: mermaid.live  OR  VS Code Mermaid Preview extension
+%% TETFund NRF 2025 | Department of Quantity Surveying, ABU Zaria
+%% =============================================================================
+
+journey
+    title iNHCES User Journey — QS Professional (Primary Persona)
+
+    section Discovery and Onboarding
+        Hear about iNHCES from NIQS or ABU Zaria network: 3: QS Professional
+        Visit nhces.ng landing page: 4: QS Professional
+        Read system description and sample estimate: 4: QS Professional
+        Register with email and institution: 4: QS Professional
+        Receive verification email from Supabase Auth: 3: QS Professional
+        Log in with JWT token issued: 5: QS Professional
+
+    section Project Setup
+        Click "New Project" on dashboard: 5: QS Professional
+        Enter project title (e.g. 3-Bed Bungalow Kaduna): 5: QS Professional
+        Select building type (Residential) and construction type (New Build): 5: QS Professional
+        Enter floor area in sqm (120): 5: QS Professional
+        Select location state (Kaduna) and geopolitical zone (North West): 5: QS Professional
+        Optionally enter client budget (target cost): 4: QS Professional
+        Save project record to Supabase: 5: QS Professional
+
+    section Cost Estimation
+        Click "Estimate Cost" for the project: 5: QS Professional
+        Frontend calls POST /estimate with project params: 5: QS Professional
+        Backend fetches latest macro + material features from Supabase: 5: QS Professional
+        Champion ML model (Stacking Ensemble) runs predict(): 5: QS Professional
+        Receive predicted cost per sqm (e.g. NGN 182,500/sqm): 5: QS Professional
+        View total estimated project cost (NGN/sqm x floor area): 5: QS Professional
+        View 90 percent confidence interval (lower and upper bounds): 5: QS Professional
+        View SHAP feature importance chart (NGN/USD dominates): 4: QS Professional
+        View data freshness warning if any feature is RED level: 3: QS Professional
+
+    section Report Generation
+        Click "Generate PDF Report": 5: QS Professional
+        Backend compiles project + prediction + SHAP data into fpdf2 PDF: 5: QS Professional
+        PDF uploaded to Cloudflare R2: 5: QS Professional
+        Presigned download URL returned (24-hour expiry): 5: QS Professional
+        QS Professional downloads report PDF: 5: QS Professional
+        Share report with client or include in BQ documentation: 4: QS Professional
+
+    section Ongoing Use
+        Return for next project estimate: 5: QS Professional
+        View history of past estimates in Projects dashboard: 4: QS Professional
+        Notice model has been retrained (MAPE improved): 4: QS Professional
+        Check macro data freshness on Pipeline Monitor dashboard: 3: QS Professional
+        Contact admin if data source shows RED outdated warning: 2: QS Professional
+
+    title iNHCES User Journey — Researcher / PI (Secondary Persona)
+
+    section Research Access
+        Log in with researcher role credentials: 5: Researcher
+        Access all projects dashboard (anonymised user_id): 4: Researcher
+
+    section Data Analysis
+        Navigate to Macro Data page: 5: Researcher
+        View latest NGN/USD, CPI, GDP, Brent crude values with sources: 5: Researcher
+        Export macro time series as CSV via GET /macro endpoint: 4: Researcher
+        Review prediction log for all users (aggregate statistics): 4: Researcher
+
+    section Model Review
+        Navigate to ML Models page: 5: Researcher
+        View champion model MAPE, R2, training date, feature importance: 5: Researcher
+        Compare champion vs. challenger performance metrics: 4: Researcher
+        Review MLflow experiment history (via admin redirect): 3: Researcher
+
+    section Pipeline Oversight
+        Check Pipeline Monitor for DAG last-run status: 4: Researcher
+        Identify any data sources with RED freshness status: 3: Researcher
+        Report data quality issues to System Admin: 3: Researcher

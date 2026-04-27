@@ -1,0 +1,83 @@
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#0F2850', 'primaryTextColor': '#FFFFFF', 'primaryBorderColor': '#B48C1E', 'lineColor': '#555555', 'secondaryColor': '#DCE6F5'}}}%%
+
+%% =============================================================================
+%% iNHCES DATA FLOW DIAGRAM — LEVEL 1
+%% Explodes the iNHCES system into 6 major processes with data stores.
+%% Render at: mermaid.live  OR  VS Code Mermaid Preview extension
+%% TETFund NRF 2025 | Department of Quantity Surveying, ABU Zaria
+%% =============================================================================
+
+graph TD
+
+    %% ── EXTERNAL ENTITIES ────────────────────────────────────────────────
+    QS["QS PROFESSIONAL"]
+    RES["RESEARCHER / PI"]
+    ADM["SYSTEM ADMIN"]
+    EXT_DATA["EXTERNAL DATA SOURCES\n(World Bank / EIA / FRED / CBN\nPropertyPro / BusinessDay / NNPC / NIQS)"]
+    GH["GITHUB CI/CD"]
+
+    %% ── PROCESSES ────────────────────────────────────────────────────────
+    P1(["1.0\nUSER\nAUTHENTICATION"])
+    P2(["2.0\nCOST\nESTIMATION\n(ML Inference)"])
+    P3(["3.0\nDATA\nINGESTION\nPIPELINE"])
+    P4(["4.0\nML MODEL\nMANAGEMENT\n(Train + Promote)"])
+    P5(["5.0\nREPORT\nGENERATION"])
+    P6(["6.0\nPIPELINE\nMONITORING\n(Drift + Health)"])
+
+    %% ── DATA STORES ──────────────────────────────────────────────────────
+    D1[("D1\nSupabase\nPostgreSQL\n(All tables)")]
+    D2[("D2\nCloudflare R2\n(PDF reports\nModel artifacts\nDatasets)")]
+    D3[("D3\nMLflow\nRegistry\n(Experiments\nModel versions)")]
+
+    %% ── P1: AUTHENTICATION FLOWS ─────────────────────────────────────────
+    QS    -->|"Email + password\n/ JWT token"| P1
+    RES   -->|"Email + password"| P1
+    ADM   -->|"Email + password"| P1
+    P1    -->|"Validated JWT token\n+ user role"| P2
+    P1    -->|"Validated JWT token"| P5
+    P1    -->|"User profile record"| D1
+    P1    -->|"Login audit event"| D1
+
+    %% ── P2: COST ESTIMATION FLOWS ────────────────────────────────────────
+    QS    -->|"Project params:\ntype, area (sqm),\nstate, zone"| P2
+    P2    -->|"Read latest macro +\nmaterial features"| D1
+    P2    -->|"Load champion\nmodel artifact (.pkl)"| D2
+    P2    -->|"Prediction result:\nNGN/sqm + CI + SHAP\n+ feature snapshot"| D1
+    P2    -->|"Cost estimate +\nSHAP explanation"| QS
+
+    %% ── P3: DATA INGESTION FLOWS ─────────────────────────────────────────
+    EXT_DATA -->|"Macro data (FX,\nCPI, GDP, oil)\nMaterial prices\nProperty listings"| P3
+    P3       -->|"Cleaned macro rows\n(macro_fx, macro_cpi,\nmacro_gdp, etc.)"| D1
+    P3       -->|"Cleaned material rows\n(cement, steel, PMS)"| D1
+    P3       -->|"Property listings\nUnit rates"| D1
+    ADM      -->|"NIQS CSV file\n(manual upload)"| P3
+
+    %% ── P4: ML MODEL MANAGEMENT FLOWS ───────────────────────────────────
+    P3    -->|"Trigger: new data\navailable signal"| P4
+    D1    -->|"Assembled feature\nmatrix for training"| P4
+    P4    -->|"Log experiment runs\n(metrics, params,\nfeature importance)"| D3
+    P4    -->|"Store model\nartifact (.pkl)"| D2
+    P4    -->|"Update ml_models\ntable (stage, MAPE, R2)"| D1
+    ADM   -->|"Promote challenger\nto champion"| P4
+    P4    -->|"Promotion audit event"| D1
+    RES   -->|"View model metrics\n+ experiment history"| P4
+    P4    -->|"Model performance\nreport"| RES
+
+    %% ── P5: REPORT GENERATION FLOWS ─────────────────────────────────────
+    QS    -->|"Request PDF report\nfor project"| P5
+    D1    -->|"Project + prediction\n+ SHAP data"| P5
+    D3    -->|"Champion model\nmetadata"| P5
+    P5    -->|"Upload PDF\nto R2"| D2
+    P5    -->|"Save report record\n(r2_key, project_id)"| D1
+    P5    -->|"Presigned download\nURL (24hr expiry)"| QS
+
+    %% ── P6: PIPELINE MONITORING FLOWS ───────────────────────────────────
+    D1    -->|"Latest feature values\nvs. training baseline"| P6
+    P6    -->|"PSI drift scores\nper feature"| D1
+    P6    -->|"Drift alert:\ntrigger emergency retrain"| P4
+    ADM   -->|"Request pipeline\nstatus"| P6
+    RES   -->|"Request data\nfreshness check"| P6
+    P6    -->|"DAG health status\nlast run times\ndata freshness"| ADM
+    P6    -->|"Data quality\nsummary"| RES
+    GH    -->|"Deploy trigger\n(push to main)"| P1
+    GH    -->|"New model code\ndeployed"| P4

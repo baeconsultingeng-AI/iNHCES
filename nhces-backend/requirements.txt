@@ -1,0 +1,38 @@
+# iNHCES Backend — Python Dependencies
+# FastAPI + Uvicorn
+fastapi==0.110.1
+uvicorn[standard]==0.29.0
+
+# Pydantic (settings + request/response validation)
+pydantic==2.6.4
+pydantic-settings==2.2.1
+
+# Supabase client
+supabase==2.4.2
+
+# JWT validation (Supabase GoTrue tokens)
+python-jose[cryptography]==3.3.0
+
+# ML model + inference
+lightgbm==4.3.0
+scikit-learn==1.4.1.post1
+shap==0.45.0
+numpy==1.26.4
+pandas==2.2.1
+
+# Cloudflare R2 / S3-compatible storage
+boto3==1.34.74
+
+# PDF generation (cost reports)
+fpdf2==2.7.9
+
+# HTTP client (Airflow API calls)
+httpx==0.27.0
+
+# File upload support
+python-multipart==0.0.9
+
+# Testing
+pytest==8.1.1
+pytest-asyncio==0.23.6
+httpx==0.27.0

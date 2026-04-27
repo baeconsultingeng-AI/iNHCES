@@ -1,0 +1,62 @@
+# iNHCES Backend — .dockerignore
+# Excludes files that must NOT be copied into the Docker image.
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Test suite (not needed in production image)
+tests/
+pytest.ini
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Development artefacts
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Generated PDFs (large; served from R2, not embedded in image)
+*.pdf
+test_report.pdf
+
+# Documentation generators (not needed at runtime)
+generate_*.py
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS artefacts
+.DS_Store
+Thumbs.db
+
+# ML model artefacts — served from Cloudflare R2 at runtime.
+# Do NOT embed models in the image; the app loads them from R2 on startup.
+models/
+*.pkl
+*.joblib
+*.onnx
+
+# Airflow DAGs (hosted separately on Railway Airflow service)
+dags/

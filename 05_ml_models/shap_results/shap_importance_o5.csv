@@ -1,0 +1,15 @@
+rank,feature,mean_abs_shap,relative_imp_pct,include_in_model
+1,d_gdp_growth_pct,0.0,0.0,Optional
+2,d_cpi_annual_pct,0.0,0.0,Optional
+3,d_lending_rate_pct,0.0,0.0,Optional
+4,d_brent_usd_barrel,0.0,0.0,Optional
+5,ret_ngn_usd,0.0,0.0,Optional
+6,ret_ngn_eur,0.0,0.0,Optional
+7,ret_ngn_gbp,0.0,0.0,Optional
+8,lag1_d_gdp_growth_pct,0.0,0.0,Optional
+9,lag1_d_cpi_annual_pct,0.0,0.0,Optional
+10,lag1_d_lending_rate_pct,0.0,0.0,Optional
+11,lag1_d_brent_usd_barrel,0.0,0.0,Optional
+12,lag1_ret_ngn_usd,0.0,0.0,Optional
+13,lag1_ret_ngn_eur,0.0,0.0,Optional
+14,lag1_ret_ngn_gbp,0.0,0.0,Optional

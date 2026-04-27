@@ -1,0 +1,70 @@
+{
+  "_comment": "iNHCES Airflow Connections Configuration",
+  "_description": "Import into Airflow with: airflow connections import nhces_connections.json",
+  "_docs": "https://airflow.apache.org/docs/apache-airflow/stable/cli-and-env-variables-ref.html#connections",
+  "_data_source": "AMBER — template; replace placeholder values with real credentials",
+  "_project": "iNHCES TETFund NRF 2025 | Dept. of Quantity Surveying, ABU Zaria",
+
+  "connections": [
+    {
+      "conn_id": "nhces_supabase_http",
+      "conn_type": "http",
+      "description": "Supabase PostgREST API for iNHCES tables",
+      "host": "https://<project-ref>.supabase.co",
+      "schema": "",
+      "login": "supabase_service_role",
+      "password": "<SUPABASE_SERVICE_KEY>",
+      "port": 443,
+      "extra": {
+        "Authorization": "Bearer <SUPABASE_SERVICE_KEY>",
+        "apikey": "<SUPABASE_SERVICE_KEY>"
+      }
+    },
+    {
+      "conn_id": "nhces_cloudflare_r2",
+      "conn_type": "aws",
+      "description": "Cloudflare R2 S3-compatible object storage",
+      "host": "https://<account-id>.r2.cloudflarestorage.com",
+      "login": "<CLOUDFLARE_R2_ACCESS_KEY>",
+      "password": "<CLOUDFLARE_R2_SECRET_KEY>",
+      "extra": {
+        "endpoint_url": "https://<account-id>.r2.cloudflarestorage.com",
+        "region_name": "auto"
+      }
+    },
+    {
+      "conn_id": "nhces_mlflow_http",
+      "conn_type": "http",
+      "description": "MLflow tracking server (Railway service)",
+      "host": "http://<mlflow-railway-service>.railway.app",
+      "port": 5000
+    },
+    {
+      "conn_id": "nhces_worldbank_http",
+      "conn_type": "http",
+      "description": "World Bank Indicators API (no key required)",
+      "host": "https://api.worldbank.org",
+      "port": 443
+    },
+    {
+      "conn_id": "nhces_fred_http",
+      "conn_type": "http",
+      "description": "FRED Federal Reserve API for FX data",
+      "host": "https://api.stlouisfed.org",
+      "port": 443,
+      "extra": {
+        "api_key": "<FRED_API_KEY>"
+      }
+    },
+    {
+      "conn_id": "nhces_eia_http",
+      "conn_type": "http",
+      "description": "EIA API for Brent crude spot prices",
+      "host": "https://api.eia.gov",
+      "port": 443,
+      "extra": {
+        "api_key": "<EIA_API_KEY>"
+      }
+    }
+  ]
+}

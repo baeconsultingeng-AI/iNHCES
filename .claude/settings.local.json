@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python generate_p9_ai_simulation_draft.py)",
+      "Bash(python generate_o4_step1.py)",
+      "Bash(python generate_o4_step2.py)",
+      "Bash(python generate_o4_step3.py)",
+      "Bash(python generate_o4_step4.py)",
+      "Bash(python 05_feature_engineering.py)",
+      "Bash(python 05_model_benchmarking.py)",
+      "Bash(python 05_shap_analysis.py)",
+      "Bash(python generate_o4_diagrams.py)",
+      "Bash(python generate_p4_pipeline_draft.py)",
+      "Bash(python generate_p5_ml_benchmarking_draft.py)",
+      "Bash(python generate_p6_mlops_draft.py)",
+      "Bash(dir \"c:\\\\Users\\\\MacBook\\\\Desktop\\\\BaeSoftIA\\\\INHCES\\\\iNHCES\\\\Research_Documents\" /b)",
+      "Bash(python generate_publication_portfolio.py)",
+      "Bash(python generate_o6_project_plan.py)",
+      "Bash(python -c ' *)",
+      "Bash(pip install *)",
+      "Bash(python -c \"from app.main import app; from app.config import get_settings; from app.auth import get_current_user; from app.database import get_db; print\\('[OK] All S1 modules import cleanly'\\)\")",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(powershell -Command \"Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force; Write-Host 'All node processes stopped'\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(powershell -Command \"Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/dashboard)",
+      "Bash(python -c \"import fastapi, lightgbm, shap, supabase; print\\('all ok'\\)\")"
+    ]
+  }
+}

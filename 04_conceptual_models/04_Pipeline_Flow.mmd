@@ -1,0 +1,128 @@
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#0F2850', 'primaryTextColor': '#FFFFFF', 'primaryBorderColor': '#B48C1E', 'lineColor': '#B48C1E', 'secondaryColor': '#1A3A6E', 'tertiaryColor': '#DCE6F5'}}}%%
+
+%% =============================================================================
+%% iNHCES AIRFLOW PIPELINE FLOW DIAGRAM
+%% Shows all 9 DAGs, their schedules, data sources, and downstream effects.
+%% Render at: mermaid.live  OR  VS Code Mermaid Preview extension
+%% TETFund NRF 2025 | Department of Quantity Surveying, ABU Zaria
+%% =============================================================================
+
+graph TD
+
+    %% ── EXTERNAL DATA SOURCES ──────────────────────────────────���─────────
+    subgraph SOURCES["EXTERNAL DATA SOURCES"]
+        direction LR
+        S_WB["World Bank API\nGDP / CPI / Lending Rate\nAnnual"]
+        S_EIA["EIA API\nBrent Crude\nMonthly / Annual"]
+        S_FRED["FRED / CBN API\nNGN/USD / EUR / GBP\nDaily"]
+        S_PROP["PropertyPro +\nPrivateProperty\nWeekly Scraper"]
+        S_BIZ["BusinessDay +\nJiji.ng\nWeekly Scraper"]
+        S_NNPC["NNPC / NMDPRA\nPMS Price by State\nMonthly"]
+        S_NBS["NBS + CBN Stats\nMonthly / Quarterly"]
+        S_NIQS["NIQS Quarterly\nSchedule\nManual Upload"]
+    end
+
+    %% ── INGESTION DAGs ───────────────────────────────────────────────────
+    subgraph DAGS_INGEST["INGESTION DAGs (Airflow on Railway)"]
+        direction TB
+        DAG1["DAG 1\nnhces_daily_fx_oil\nCRON: 0 5 * * *\n(06:00 WAT daily)"]
+        DAG2["DAG 2\nnhces_weekly_materials\nCRON: 0 5 * * 1\n(Monday 06:00 WAT)"]
+        DAG3["DAG 3\nnhces_weekly_property\nCRON: 0 5 * * 2\n(Tuesday 06:00 WAT)"]
+        DAG4["DAG 4\nnhces_monthly_macro\nCRON: 0 5 1 * *\n(1st of month)"]
+        DAG5["DAG 5\nnhces_quarterly_niqs\nTrigger: Manual\n(Admin upload)"]
+        DAG6["DAG 6\nnhces_quarterly_nbs\nCRON: 0 5 1 1,4,7,10 *\n(Quarterly)"]
+        DAG7["DAG 7\nnhces_worldbank_annual\nCRON: 0 5 2 1 *\n(2 Jan annually)"]
+    end
+
+    %% ── DATABASE ─────────────────────────────────────────────────────────
+    subgraph DB["SUPABASE POSTGRESQL"]
+        direction LR
+        T_FX["macro_fx"]
+        T_OIL["macro_oil"]
+        T_CPI["macro_cpi"]
+        T_GDP["macro_gdp"]
+        T_INT["macro_interest"]
+        T_CEM["material_cement"]
+        T_STL["material_steel"]
+        T_PMS["material_pms"]
+        T_UR["unit_rates"]
+        T_MP["market_prices"]
+    end
+
+    %% ── ML DAGs ──────────────────────────────────────────────────────────
+    subgraph DAGS_ML["ML DAGs (Airflow on Railway)"]
+        direction TB
+        DAG8["DAG 8\nnhces_retrain_weekly\nCRON: 0 1 * * 0\n(Sunday 02:00 WAT)"]
+        DAG9["DAG 9\nnhces_drift_monitor\nCRON: 0 17 * * *\n(18:00 WAT daily)"]
+    end
+
+    %% ── ML LAYER ─────────────────────────────────────────────────────────
+    subgraph ML["ML LAYER (MLflow + Cloudflare R2)"]
+        direction LR
+        FEAT["Feature\nEngineering\n(join all tables)"]
+        TRAIN["Model Training\n(XGB + LGB + RF\n+ Stacking)"]
+        EVAL["Evaluation\n(MAPE / R2 / MAE\ntest set)"]
+        COMP["Champion vs.\nChallenger\nComparison"]
+        PROMOTE["Auto-promote\nif MAPE improves\n> 0.5%"]
+        MLFLOW["MLflow\nExperiment Tracker\n+ Model Registry"]
+        R2_MODEL["Cloudflare R2\nModel Artifact\n(.pkl)"]
+    end
+
+    %% ── DRIFT DETECTION ──────────────────────────────────────────────────
+    subgraph DRIFT["DRIFT DETECTION (DAG 9)"]
+        direction LR
+        PSI["Compute PSI\nper feature\nvs. training baseline"]
+        ALERT["PSI > 0.2?\nTrigger emergency\nretrain alert"]
+    end
+
+    %% ── FASTAPI INFERENCE ────────────────────────────────────────────────
+    API["FastAPI\nPOST /estimate\n(loads champion model\nfrom R2 on startup)"]
+
+    %% ── SOURCE TO DAG CONNECTIONS ──────────────────────��─────────────────
+    S_EIA  -->|"Brent price"| DAG1
+    S_FRED -->|"FX rates"| DAG1
+    S_BIZ  -->|"Cement + steel"| DAG2
+    S_PROP -->|"Property prices"| DAG3
+    S_WB   -->|"CPI + GDP + lending"| DAG4
+    S_NNPC -->|"PMS prices"| DAG4
+    S_NIQS -->|"Unit rates CSV"| DAG5
+    S_NBS  -->|"NBS construction stats"| DAG6
+    S_WB   -->|"Annual GDP"| DAG7
+
+    %% ── DAG TO DATABASE CONNECTIONS ─────────────────────────────────────
+    DAG1 -->|"INSERT daily rows"| T_FX
+    DAG1 -->|"INSERT daily rows"| T_OIL
+    DAG2 -->|"INSERT weekly rows"| T_CEM
+    DAG2 -->|"INSERT weekly rows"| T_STL
+    DAG3 -->|"INSERT weekly rows"| T_MP
+    DAG4 -->|"INSERT monthly rows"| T_CPI
+    DAG4 -->|"INSERT monthly rows"| T_INT
+    DAG4 -->|"INSERT monthly rows"| T_PMS
+    DAG5 -->|"INSERT quarterly rows"| T_UR
+    DAG6 -->|"INSERT quarterly stats"| T_GDP
+    DAG7 -->|"INSERT annual rows"| T_GDP
+
+    %% ── DATABASE TO ML RETRAIN ───────────────────────────────────────────
+    T_FX & T_OIL & T_CPI & T_GDP & T_INT -->|"Macro feature matrix"| FEAT
+    T_CEM & T_STL & T_PMS & T_UR & T_MP  -->|"Material feature matrix"| FEAT
+
+    %% ── ML RETRAIN PIPELINE ──────────────────────────────────────────────
+    DAG8 -->|"Weekly trigger\n(Sunday)"| FEAT
+    FEAT --> TRAIN
+    TRAIN --> EVAL
+    EVAL --> COMP
+    COMP -->|"Log all runs"| MLFLOW
+    COMP --> PROMOTE
+    PROMOTE -->|"Store champion .pkl"| R2_MODEL
+    PROMOTE -->|"Update is_champion\nin ml_models table"| DB
+
+    %% ── DRIFT MONITOR ────────────────────────────────────────────────────
+    DAG9 -->|"Daily trigger\n(18:00 WAT)"| PSI
+    DB   -->|"Latest feature\nvalues"| PSI
+    MLFLOW -->|"Training baseline\ndistribution"| PSI
+    PSI --> ALERT
+    ALERT -->|"If PSI > 0.2:\nEmergency retrain"| FEAT
+
+    %% ── MODEL SERVING ──────────────────────────────────────────────────��─
+    R2_MODEL -->|"Load on startup\nor cache refresh"| API
+    MLFLOW   -->|"Champion model\nmetadata"| API

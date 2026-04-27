@@ -1,0 +1,203 @@
+# iNHCES CI/CD Pipeline
+# GitHub Actions workflow: test → lint → build → deploy
+#
+# Triggers:
+#   push to main   → full test + deploy (backend to Railway, frontend to Vercel)
+#   pull_request   → test + lint only (no deploy)
+#
+# Required GitHub Secrets (Settings → Secrets → Actions):
+#   RAILWAY_TOKEN          — Railway API token (from Railway dashboard → Account → Tokens)
+#   RAILWAY_SERVICE_ID     — Railway service ID for nhces-backend
+#   VERCEL_TOKEN           — Vercel API token
+#   VERCEL_ORG_ID          — Vercel team/org ID
+#   VERCEL_PROJECT_ID      — Vercel project ID for nhces-frontend
+#
+# TETFund NRF 2025 | Department of Quantity Surveying, ABU Zaria
+
+name: iNHCES CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel in-flight runs on the same branch when a newer push arrives
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12"
+  NODE_VERSION: "20"
+
+# ── Job 1: Backend Tests ───────────────────────────────────────────────────────
+jobs:
+  backend-tests:
+    name: Backend Tests (pytest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nhces-backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: nhces-backend/requirements.txt
+
+      - name: Install dependencies
+        run: pip install --no-cache-dir -r requirements.txt
+
+      - name: Run pytest (73 tests)
+        run: |
+          python -m pytest tests/ \
+            --tb=short \
+            --strict-markers \
+            -q \
+            --junit-xml=test-results.xml
+        env:
+          # Minimal env vars so Settings() doesn't raise on startup
+          SUPABASE_URL: "https://placeholder.supabase.co"
+          SUPABASE_ANON_KEY: "placeholder-anon-key"
+          SUPABASE_SERVICE_KEY: "placeholder-service-key"
+          SUPABASE_JWT_SECRET: "placeholder-jwt-secret-32-chars-!!"
+          ENVIRONMENT: "testing"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-test-results
+          path: nhces-backend/test-results.xml
+
+# ── Job 2: Frontend Build + Lint ──────────────────────────────────────────────
+  frontend-build:
+    name: Frontend Build (Next.js)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nhces-frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: nhces-frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+        continue-on-error: true  # Lint warnings should not block deploy
+
+      - name: Build
+        run: npm run build
+        env:
+          # Required at build time for static generation
+          NEXT_PUBLIC_SUPABASE_URL: "https://placeholder.supabase.co"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "placeholder-anon-key"
+          NEXT_PUBLIC_API_URL: "https://nhces-api.up.railway.app"
+          # Prevent Next.js telemetry during CI
+          NEXT_TELEMETRY_DISABLED: "1"
+
+# ── Job 3: Deploy Backend to Railway ─────────────────────────────────────────
+  deploy-backend:
+    name: Deploy Backend → Railway
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-build]
+    # Only deploy on push to main (not on pull requests)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy to Railway
+        run: |
+          railway up \
+            --service "${{ secrets.RAILWAY_SERVICE_ID }}" \
+            --detach
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Wait for Railway deployment to go live
+        run: |
+          echo "Waiting 45 seconds for Railway to deploy..."
+          sleep 45
+
+      - name: Verify backend health
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            https://nhces-api.up.railway.app/health)
+          echo "Health check HTTP status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "ERROR: Backend health check failed (HTTP $STATUS)"
+            exit 1
+          fi
+          echo "Backend is healthy."
+
+# ── Job 4: Deploy Frontend to Vercel ─────────────────────────────────────────
+  deploy-frontend:
+    name: Deploy Frontend → Vercel
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Pull Vercel environment info
+        run: |
+          vercel pull \
+            --yes \
+            --environment=production \
+            --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: nhces-frontend
+
+      - name: Build for Vercel
+        run: |
+          vercel build \
+            --prod \
+            --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: nhces-frontend
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+
+      - name: Deploy to Vercel (production)
+        id: vercel-deploy
+        run: |
+          DEPLOY_URL=$(vercel deploy \
+            --prebuilt \
+            --prod \
+            --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
+          echo "Deployed to: $DEPLOY_URL"
+        working-directory: nhces-frontend
+
+      - name: Verify frontend deployment
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            ${{ steps.vercel-deploy.outputs.url }})
+          echo "Frontend HTTP status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "WARNING: Frontend returned HTTP $STATUS (may still be warming up)"
+          fi

@@ -1,0 +1,117 @@
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#0F2850', 'primaryTextColor': '#FFFFFF', 'primaryBorderColor': '#B48C1E', 'lineColor': '#B48C1E', 'secondaryColor': '#1A3A6E', 'tertiaryColor': '#DCE6F5'}}}%%
+
+graph TD
+
+    %% ── USERS ─────────────────────────────────────────────────────────────
+    subgraph USERS["USER LAYER"]
+        direction LR
+        U1[QS Professional]
+        U2[Researcher / PI]
+        U3[System Admin]
+    end
+
+    %% ── FRONTEND ──────────────────────────────────────────────────────────
+    subgraph FRONTEND["PRESENTATION LAYER - Vercel CDN"]
+        direction LR
+        FE1["index.html - Cost Estimator Form"]
+        FE2["dashboard.html - Pipeline Monitor"]
+        FE3["app.js / styles.css - Shared Logic"]
+        FE1 --- FE3
+        FE2 --- FE3
+    end
+
+    %% ── BACKEND API ───────────────────────────────────────────────────────
+    subgraph BACKEND["API LAYER - FastAPI on Railway"]
+        direction TB
+        AUTH["JWT Auth Middleware"]
+        API1["POST /estimate - ML cost prediction"]
+        API2["GET /macro - Macro data feed"]
+        API3["CRUD /projects - Project management"]
+        API4["POST /reports - PDF report generation"]
+        API5["GET /pipeline - Airflow status"]
+        AUTH --> API1 & API2 & API3 & API4 & API5
+    end
+
+    %% ── ML LAYER ──────────────────────────────────────────────────────────
+    subgraph MLAYER["ML LAYER - MLflow on Railway"]
+        direction TB
+        ML1["Champion Model - Stacking Ensemble\nXGBoost + LightGBM + RF -> Ridge meta"]
+        ML2["Model Registry - Versioned Artifacts"]
+        ML3["Experiment Tracker - Runs / Metrics / Params"]
+        ML4["Challenger Models - RF / XGB / LGB / MLP / SVR / Ridge"]
+        ML1 --- ML2
+        ML3 --- ML2
+        ML4 --- ML3
+    end
+
+    %% ── DATABASE ──────────────────────────────────────────────────────────
+    subgraph DATABASE["DATA LAYER - Supabase PostgreSQL"]
+        direction LR
+        DB1[("macro_fx / macro_cpi\nmacro_gdp / macro_interest\nmacro_oil")]
+        DB2[("material_cement\nmaterial_steel / material_pms")]
+        DB3[("unit_rates\nmarket_prices")]
+        DB4[("projects / predictions\nreports")]
+        DB5[("ml_models / users\naudit_log")]
+    end
+
+    %% ── STORAGE ───────────────────────────────────────────────────────────
+    subgraph STORAGE["STORAGE LAYER - Cloudflare R2"]
+        direction LR
+        S1["PDF Reports - per project"]
+        S2["Model Artifacts - .pkl / .json"]
+        S3["Training Datasets - versioned CSVs"]
+    end
+
+    %% ── AIRFLOW PIPELINE ─────────────────────────────────────────────────
+    subgraph PIPELINE["PIPELINE LAYER - Apache Airflow on Railway"]
+        direction LR
+        P1["nhces_daily_fx_oil\n@ 06:00 WAT"]
+        P2["nhces_weekly_materials\n@ Monday"]
+        P3["nhces_weekly_property\n@ Tuesday"]
+        P4["nhces_monthly_macro\n@ 1st of month"]
+        P5["nhces_quarterly_niqs\n@ manual trigger"]
+        P6["nhces_worldbank_annual\n@ January"]
+        P7["nhces_retrain_weekly\n@ Sunday"]
+        P8["nhces_drift_monitor\n@ 18:00 WAT"]
+    end
+
+    %% ── EXTERNAL DATA SOURCES ────────────────────────────────────────────
+    subgraph EXTERNAL["EXTERNAL DATA SOURCES"]
+        direction LR
+        E1["World Bank Open Data API\nGDP / CPI / Lending Rate"]
+        E2["EIA API\nBrent Crude Price"]
+        E3["FRED / CBN API\nNGN/USD / EUR / GBP"]
+        E4["PropertyPro + Private Property\nNGN/sqm Listings - Scraper"]
+        E5["BusinessDay + Jiji.ng\nCement / Iron Rod - Scraper"]
+        E6["NNPC / NMDPRA\nPMS Petrol Price"]
+        E7["NIQS Quarterly Schedule\nUnit Rates - Manual Upload"]
+    end
+
+    %% ── CI/CD ────────────────────────────────────────────────────────────
+    subgraph CICD["CI/CD - GitHub Actions"]
+        direction LR
+        CI1["test.yml - Pytest on PR"]
+        CI2["deploy.yml - Railway + Vercel"]
+    end
+
+    %% ── CONNECTIONS ──────────────────────────────────────────────────────
+
+    USERS -->|"HTTPS"| FRONTEND
+    FRONTEND -->|"REST API / JSON"| BACKEND
+    API1 -->|"predict cost_per_sqm"| ML1
+    API4 -->|"retrieve model metadata"| ML2
+    API1 & API2 & API3 & API4 & API5 -->|"SQL via Supabase client"| DATABASE
+    API4 -->|"upload PDF presigned URL"| STORAGE
+    ML2 -->|"store / retrieve artifacts"| S2
+    ML3 -->|"store training datasets"| S3
+    PIPELINE -->|"INSERT macro / material / property data"| DATABASE
+    P7 -->|"trigger retrain - log to MLflow"| MLAYER
+    P8 -->|"PSI drift check / emergency retrain"| MLAYER
+    E1 -->|"HTTP API"| P4 & P6
+    E2 -->|"HTTP API"| P1
+    E3 -->|"HTTP API"| P1
+    E4 & E5 -->|"web scraper"| P2 & P3
+    E6 -->|"HTTP / scraper"| P4
+    E7 -->|"CSV upload"| P5
+    CICD -->|"deploy on merge to main"| BACKEND
+    CICD -->|"deploy on merge to main"| FRONTEND
