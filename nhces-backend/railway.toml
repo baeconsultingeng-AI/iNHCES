@@ -5,9 +5,9 @@
 
 [build]
 builder          = "DOCKERFILE"
-dockerfilePath   = "nhces-backend/Dockerfile"
-# Build context is the repo root so that railway.toml and nhces-backend/ are
-# both visible during the Docker build.
+dockerfilePath   = "Dockerfile"
+# Root directory is set to nhces-backend/ in the Railway dashboard.
+# All paths here are relative to that root directory.
 
 [deploy]
 # Public domain alias (configure in Railway dashboard → Settings → Networking)
