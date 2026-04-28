@@ -12,7 +12,7 @@ dockerfilePath   = "Dockerfile"
 [deploy]
 # Public domain alias (configure in Railway dashboard → Settings → Networking)
 # The frontend vercel.json rewrites /api/* to https://nhces-api.up.railway.app/*
-startCommand   = "python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --log-level info --access-log"
+startCommand   = "/bin/sh -c \"python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --log-level info --access-log\""
 healthcheckPath = "/health"
 healthcheckTimeout = 30
 restartPolicyType  = "ON_FAILURE"
