@@ -389,17 +389,17 @@ def generate():
 
     pdf.step_box("2", "Create a storage bucket",
         ["In the R2 dashboard, click 'Create bucket'",
-         "Bucket name: nhces-storage  (EXACTLY this name -- lowercase, hyphens only)",
+         "Bucket name: inhces-storage  (EXACTLY this name -- lowercase, hyphens only)",
          "Location: Automatic",
          "Click 'Create bucket'"],
-        tip="The bucket name 'nhces-storage' is hardcoded in the backend config. Use exactly this name.")
+        tip="The bucket name 'inhces-storage' is hardcoded in the backend config. Use exactly this name.")
 
     pdf.step_box("3", "Create R2 API keys (Access Keys)",
         ["In the R2 dashboard, look for 'Manage R2 API Tokens' (right side of the page)",
          "Click 'Create API token'",
          "Token name: iNHCES Backend",
          "Permissions: Object Read & Write",
-         "Specify bucket: nhces-storage",
+         "Specify bucket: inhces-storage",
          "Click 'Create API Token'",
          "COPY BOTH values immediately and save them to a text file:",
          "  -> Access Key ID  (looks like: abc123...)",
@@ -415,7 +415,7 @@ def generate():
     pdf.step_box("5", "Upload the ML champion model to R2",
         ["The champion model file is in your project at:",
          "05_ml_models/models/champion_model.pkl",
-         "If this file exists: In the R2 dashboard, open the nhces-storage bucket",
+         "If this file exists: In the R2 dashboard, open the inhces-storage bucket",
          "Click 'Upload', then 'Upload files'",
          "Create a folder called 'models' first (click 'Create folder')",
          "Upload champion_model.pkl into the models/ folder",
@@ -452,7 +452,7 @@ def generate():
          "   CLOUDFLARE_R2_ENDPOINT   = https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com",
          "   CLOUDFLARE_R2_ACCESS_KEY = (your R2 access key ID)",
          "   CLOUDFLARE_R2_SECRET_KEY = (your R2 secret access key)",
-         "   CLOUDFLARE_R2_BUCKET     = nhces-storage",
+         "   CLOUDFLARE_R2_BUCKET     = inhces-storage",
          "   SECRET_KEY               = (type any long random string -- 40+ characters)",
          "   ENVIRONMENT              = production",
          "   ALLOWED_ORIGINS          = https://YOUR_VERCEL_URL.vercel.app"],
@@ -621,7 +621,7 @@ def generate():
         ("GitHub",    "All files are in the repo (not just some)"),
         ("Supabase",  "16 tables visible in Supabase Table Editor"),
         ("Supabase",  "RLS policies show 'RLS Enabled' on each table"),
-        ("R2",        "nhces-storage bucket exists in Cloudflare R2"),
+        ("R2",        "inhces-storage bucket exists in Cloudflare R2"),
         ("R2",        "models/champion_model.pkl uploaded to the bucket"),
         ("Railway",   "Backend /health returns {status: ok}"),
         ("Railway",   "Backend /docs shows the Swagger API documentation page"),
@@ -700,3 +700,4 @@ def generate():
 
 if __name__ == "__main__":
     generate()
+

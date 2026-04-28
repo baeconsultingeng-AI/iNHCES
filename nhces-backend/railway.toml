@@ -53,7 +53,7 @@ description = "R2 S3-compatible secret access key"
 
 [[deploy.envVars]]
 name = "CLOUDFLARE_R2_BUCKET"
-description = "R2 bucket name (default: nhces-storage)"
+description = "R2 bucket name (default: inhces-storage)"
 
 [[deploy.envVars]]
 name = "MLFLOW_TRACKING_URI"
@@ -82,3 +82,4 @@ description = "production"
 [[deploy.envVars]]
 name = "ALLOWED_ORIGINS"
 description = "https://nhces.vercel.app,https://nhces-api.up.railway.app"
+

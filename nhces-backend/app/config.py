@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     cloudflare_r2_endpoint: str = ""
     cloudflare_r2_access_key: str = ""
     cloudflare_r2_secret_key: str = ""
-    cloudflare_r2_bucket: str = "nhces-storage"
+    cloudflare_r2_bucket: str = "inhces-storage"
 
     # MLflow
     mlflow_tracking_uri: str = "http://localhost:5000"
@@ -56,3 +56,4 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+

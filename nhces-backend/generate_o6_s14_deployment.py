@@ -151,7 +151,7 @@ def generate():
         ("nhces-frontend",  "Vercel",   "Next.js 14 SSR",          "https://nhces.vercel.app"),
         ("nhces-backend",   "Railway",  "FastAPI + LightGBM",       "https://nhces-api.up.railway.app"),
         ("nhces-db",        "Supabase", "PostgreSQL + RLS + Auth",  "https://<ref>.supabase.co"),
-        ("nhces-storage",   "Cloudflare R2", "Object storage",      "https://<acct>.r2.cloudflarestorage.com"),
+        ("inhces-storage",   "Cloudflare R2", "Object storage",      "https://<acct>.r2.cloudflarestorage.com"),
         ("nhces-mlflow",    "Railway",  "MLflow tracking server",   "http://<svc>.railway.app:5000"),
         ("nhces-airflow",   "Railway",  "Apache Airflow 2.8",       "http://<svc>.railway.app:8080"),
     ]
@@ -451,7 +451,7 @@ def generate():
         ("CLOUDFLARE_R2_ENDPOINT",       "Railway + local", "Yes", "https://<acct>.r2.cloudflarestorage.com"),
         ("CLOUDFLARE_R2_ACCESS_KEY",     "Railway + local", "Yes", "R2 access key ID"),
         ("CLOUDFLARE_R2_SECRET_KEY",     "Railway + local", "Yes", "R2 secret access key"),
-        ("CLOUDFLARE_R2_BUCKET",         "Railway + local", "No",  "Default: nhces-storage"),
+        ("CLOUDFLARE_R2_BUCKET",         "Railway + local", "No",  "Default: inhces-storage"),
         ("MLFLOW_TRACKING_URI",          "Railway + local", "No",  "http://<svc>.railway.app:5000"),
         ("MLFLOW_EXPERIMENT",            "Railway + local", "No",  "Default: nhces_cost_estimation"),
         ("AIRFLOW_API_URL",              "Railway + local", "No",  "http://<svc>.railway.app:8080/api/v1"),
@@ -501,8 +501,8 @@ def generate():
         ("BACKEND","All 73 pytest tests pass: python -m pytest tests/ -q"),
         ("BACKEND","Railway environment variables all set"),
         ("BACKEND","Railway deployment live: curl https://nhces-api.up.railway.app/health"),
-        ("BACKEND","R2 bucket nhces-storage created with public access blocked"),
-        ("BACKEND","champion_model.pkl uploaded to R2: nhces-storage/models/champion_model.pkl"),
+        ("BACKEND","R2 bucket inhces-storage created with public access blocked"),
+        ("BACKEND","champion_model.pkl uploaded to R2: inhces-storage/models/champion_model.pkl"),
         ("BACKEND","API docs accessible: https://nhces-api.up.railway.app/docs"),
         ("FRONTEND","Vercel environment variables set"),
         ("FRONTEND","next build completes without errors locally"),
@@ -567,3 +567,4 @@ def generate():
 
 if __name__ == "__main__":
     generate()
+
