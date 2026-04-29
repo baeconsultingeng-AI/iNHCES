@@ -504,6 +504,12 @@ def section3(pdf):
         "had produced the following AI-assisted outputs:"
     )
     scale_data = [
+        ("Simulation start date (O1, Session 1)",
+         "23 April 2026"),
+        ("Simulation end date (O6, production deployment live)",
+         "29 April 2026"),
+        ("Total elapsed calendar days (simulation start to live deployment)",
+         "6 days"),
         ("Python analysis / generator scripts", "~68"),
         ("TypeScript / React frontend files (Next.js 14)", "~30"),
         ("PDF documents (research outputs)", "~57"),
@@ -532,7 +538,9 @@ def section3(pdf):
     pdf.set_text_color(*MID_GREY)
     pdf.set_x(LEFT)
     pdf.multi_cell(PAGE_W, 4.5, sanitize(
-        "Table 3: Scale of AI-assisted simulation outputs from iNHCES O1-O6 (fully complete). "
+        "Table 3: Scale of AI-assisted simulation outputs from iNHCES O1-O6 "
+        "(simulation start: 23 April 2026; production deployment: 29 April 2026 -- "
+        "6 calendar days, ~52 AI-assisted hours). "
         "Estimated hours are indicative and based on researcher judgement; "
         "formal time-tracking data to be collected in the pilot workshop study."
     ))
