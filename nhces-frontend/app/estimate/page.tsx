@@ -55,7 +55,7 @@ function MacroContextPanel({ snapshot }: { snapshot: MacroSnapshot | null }) {
   const [open, setOpen] = useState(false);
   if (!snapshot) return null;
   return (
-    <div style={{ marginTop: 14, border: `1px solid ${COLOURS.border}`, borderRadius: 10, overflow: 'hidden' }}>
+    <div style={{ marginTop: 14, border: `1px solid ${COLOURS.border}`, borderRadius: 10 }}>
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
@@ -63,6 +63,7 @@ function MacroContextPanel({ snapshot }: { snapshot: MacroSnapshot | null }) {
           width: '100%', display: 'flex', alignItems: 'center',
           justifyContent: 'space-between', padding: '9px 14px',
           background: COLOURS.accentBg, border: 'none', cursor: 'pointer',
+          borderRadius: '10px 10px 0 0',
         }}
       >
         <span style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 600, color: COLOURS.accent }}>
