@@ -78,7 +78,7 @@ function MacroContextPanel({ snapshot }: { snapshot: MacroSnapshot | null }) {
             Automatically fetched from the iNHCES data pipeline and used for your prediction.
             To update, visit the <a href="/macro" style={{ color: COLOURS.accent }}>Macro Data</a> page.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 8px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 8px', maxHeight: 260, overflowY: 'auto' }}>
             {snapshot.variables.map(v => (
               <div key={v.variable} style={{ background: COLOURS.surfaceAlt, borderRadius: 6, padding: '5px 8px' }}>
                 <p style={{ fontFamily: 'var(--font-ui)', fontSize: 10, color: COLOURS.textDim, margin: '0 0 1px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
