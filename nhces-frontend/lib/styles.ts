@@ -98,9 +98,9 @@ export const GS: Record<string, CSSProperties> = {
   },
   navBtn: {
     fontFamily:     FONTS.ui,
-    fontSize:       14,
+    fontSize:       15,
     fontWeight:     500,
-    color:          COLOURS.textMuted,
+    color:          COLOURS.accent,
     padding:        '6px 14px',
     borderRadius:   RADIUS_SM,
     border:         'none',
