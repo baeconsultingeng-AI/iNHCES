@@ -25,7 +25,7 @@ Every session is governed by the S2RF Governing Preamble:
 
 ## GitHub Repository
 https://github.com/baeconsultingeng-AI/iNHCES
-Branch: master | Last push: 227 files | CI/CD: GitHub Actions live
+Branch: master | Latest commit: `21bef60` (April 29 2026) | CI/CD: GitHub Actions live
 
 ---
 
@@ -79,7 +79,7 @@ Branch: master | Last push: 227 files | CI/CD: GitHub Actions live
 | P4 | Data Pipeline | P4_Data_Pipeline_Draft.pdf | 10pp | AMBER/RED (scrapers pending) |
 | P5 | ML Benchmarking | P5_ML_Benchmarking_Draft.pdf | 11pp | RED + Section 5B |
 | P6 | MLOps Architecture | P6_MLOps_Architecture_Draft.pdf | 12pp | AMBER |
-| P7 | Full iNHCES System | Post-deployment | — | Not started |
+| P7 | Full iNHCES System | `generate_p7_full_system_draft.py` (updated Apr 29) | ~12pp | AMBER (generator updated: transparency panels, 3D logo, deployment section) |
 | P8 | Housing Policy | Post-deployment | — | Not started |
 | P9 | AI Research Simulation | P9_AI_Research_Simulation_Draft.pdf | 27pp | AMBER (O1-O5 walkthrough) |
 
@@ -110,6 +110,7 @@ Last confirmed healthy: `{"status":"ok","db":{"status":"ok"},"ml_model":"loaded"
 | `4dbcab1` | iNHCES 3D isometric logo (house + i-dot + ascending bars) — `Logo.tsx`, `public/logo.svg`, `app/icon.svg` (auto-favicon) |
 | `b321af2` | Navbar font size +10% (14→15 px), color → accent gold `#8b6400` |
 | latest | **Estimate page transparency** — Part A: Macro Context panel (7 raw macro values, collapsible, below form); Part B: Feature Snapshot panel (all 14 derived model inputs with human-readable labels, collapsible, below SHAP). No backend changes required (`feature_snapshot` was already in `EstimateResponse`). |
+| `21bef60` | P7 generator updated (transparency panels documented in Section 7.2 + 7.3); CLAUDE.md + PROJECT_CONTEXT.md updated; REVIEW FREEZE applied |
 
 ## ⛔ REVIEW FREEZE
 All code changes are frozen pending a complete review by the research team.

@@ -1,7 +1,7 @@
 # iNHCES Project Context Document
 **Intelligent National Housing Cost Estimating System**
 TETFund NRF 2025 | Department of Quantity Surveying, ABU Zaria
-**Last updated:** 2026-04-27  |  **Session:** O6-S15 complete — ALL O6 SESSIONS COMPLETE. S12 (73/73 tests pass), S13 (API docs PDF, 13pp), S14 (Dockerfile + CI/CD + 6 Airflow DAGs + deployment guide), S15 (beginner deployment guide, 14pp). iNHCES build is FULLY COMPLETE — ready for deployment.
+**Last updated:** 2026-04-29  |  **Session:** O6 FULLY COMPLETE + DEPLOYED + REVIEW FREEZE. GitHub: https://github.com/baeconsultingeng-AI/iNHCES (master, latest: `21bef60`). System LIVE: https://i-nhces.vercel.app | https://inhces-production.up.railway.app. Post-deployment UI improvements applied (icons, 3D logo, navbar style, estimate transparency). ⛔ REVIEW FREEZE — no further code changes until research team review complete.
 
 > **Purpose:** This document is the single source of truth for resuming development after any session interruption.
 > When starting a new session (Copilot Chat, Claude extension, or Claude Code CLI), read this file first.
@@ -58,7 +58,7 @@ TETFund NRF 2025 | Department of Quantity Surveying, ABU Zaria
 
 | Layer | Technology | Hosting |
 |-------|-----------|---------|
-| Frontend | Vanilla HTML / CSS / JavaScript | Vercel |
+| Frontend | Next.js 14 (App Router, TypeScript, Warm Ivory design) | Vercel |
 | Backend API | FastAPI (Python 3.10+) | Railway |
 | Database | Supabase PostgreSQL | Supabase |
 | ML Registry | MLflow Tracking Server | Railway |
@@ -678,11 +678,11 @@ iNHCES/
 | P1 — PRISMA SLR | Construction Mgmt & Economics | O1 Steps 1-3 | Months 3-5 | ✅ Draft PDF |
 | P2 — Delphi Requirements | Eng., Const. & Arch. Mgmt | O1-Step4 + O3 | Months 8-10 | ✅ Draft PDF |
 | P3 — Macroeconomic Determinants | Construction Mgmt & Economics | O2 Steps 2-4 | Months 6-8 | ✅ Draft PDF |
-| P4 — Automated Data Pipeline | Scientific Data | O2-Step1+O4+O5a | Months 12-14 | ⬜ Not started |
-| P5 — ML Benchmarking | J. Const. Eng. & Mgmt (ASCE) | O5 Steps 1-3 | Months 15-17 | ⬜ Not started |
-| P6 — MLOps Architecture | Expert Systems with Applications | O5 Steps 4-5 | Months 16-18 | ⬜ Not started |
-| P7 — Full iNHCES System (FLAGSHIP) | Automation in Construction (IF ~9.6) | O6 All Steps | Months 21-24 | ⬜ Not started |
-| P8 — Housing Policy | Habitat International | Post O6 | Months 23-26 | ⬜ Not started |
+| P4 | Automated Data Pipeline | Scientific Data | O2-Step1+O4+O5a | Months 12-14 | ✅ Draft PDF (AMBER/RED, 10pp) |
+| P5 | ML Benchmarking | J. Const. Eng. & Mgmt (ASCE) | O5 Steps 1-3 | Months 15-17 | ✅ Draft PDF (RED, 11pp) |
+| P6 | MLOps Architecture | Expert Systems with Applications | O5 Steps 4-5 | Months 16-18 | ✅ Draft PDF (AMBER, 12pp) |
+| P7 | Full iNHCES System (FLAGSHIP) | Automation in Construction (IF ~9.6) | O6 All Steps | Months 21-24 | ✅ Generator updated (Apr 29) — transparency + deployment sections |
+| P8 | Housing Policy | Habitat International | Post O6 | Months 23-26 | ⏳ Post-deployment |
 | **P9 — AI Research Simulation Framework** | **Computers & Education / IETI / AI & Society** | **Meta: O1-O6 process** | **Months 24-26** | **✅ Draft PDF (AMBER, 26pp)** |
 
 ### P9 — Key Details
@@ -695,7 +695,33 @@ iNHCES/
 
 ---
 
-## 10. How to Resume Development
+## 10. Post-Deployment UI Improvements (April 29 2026)
+
+| Commit | Change | Files |
+|--------|--------|-------|
+| `fc6ae51` | `lucide-react` icons on all Navbar items | `Navbar.tsx`, `package.json` |
+| `4dbcab1` | iNHCES 3D isometric logo (house + i-dot + ascending bars) | `Logo.tsx`, `public/logo.svg`, `app/icon.svg` |
+| `b321af2` | Navbar font size +10% (14→15 px), color → accent gold `#8b6400` | `lib/styles.ts` |
+| `21bef60` | Estimate page transparency: Part A Macro Context panel + Part B Feature Snapshot panel | `app/estimate/page.tsx` |
+
+### Estimate Page Transparency Design (commit `21bef60`)
+- **Part A — Macro Context panel** (left column, below form): 7 raw macro values (CPI, GDP growth, lending rate, Brent crude, NGN/USD/EUR/GBP) auto-fetched from `GET /macro` at page load. Collapsible. DataSourceBadge (GREEN/AMBER/RED). Link to `/macro` page for updates.
+- **Part B — Feature Snapshot panel** (right column, below SHAP chart): all 14 derived model inputs (first differences and % returns) fed to LightGBM, with human-readable labels and sign-coded values. Collapsible. Already available in `EstimateResponse.feature_snapshot` — zero backend changes needed.
+- **Form heading** now reads `A. User-provided project inputs` to mirror the `B.` macro panel label — making the two-group transparency structure explicit.
+
+## ⛔ REVIEW FREEZE (as of April 29 2026)
+All code changes frozen pending research team review. No new implementation until freeze is lifted.
+
+**What to review:**
+1. Live system: https://i-nhces.vercel.app — all 8 pages, Navbar icons, logo, font/colour
+2. Estimate page: transparency panels (Part A + Part B)
+3. Draft papers: P1–P9 in `Draft AI Papers/` — verify DATA SOURCE banners, content accuracy
+4. CLAUDE.md + PROJECT_CONTEXT.md — verify accuracy of status entries
+5. GitHub repo: https://github.com/baeconsultingeng-AI/iNHCES — verify CI/CD, test coverage
+
+---
+
+## 11. How to Resume Development
 
 ### In Copilot Chat (GitHub Copilot)
 1. Open this project in VS Code
@@ -723,15 +749,16 @@ Change the status emoji in Section 6:
 
 ---
 
-## 11. Known Issues / Session Error Log
+## 12. Known Issues / Session Error Log
 
 | Date | Error | Cause | Resolution |
 |------|-------|-------|-----------|
 | 2026-04-23 | `400 {"message":"A maximum of 100 PDF pages may be provided."}` | Previous session attached all 3 research PDFs (>100 pages combined) in one request | Attach only 1-2 relevant PDFs per session. The 3 research documents combined exceed 100 pages. Attach only the section relevant to the current objective. |
+| 2026-04-29 | CORS policy: No 'Access-Control-Allow-Origin' header on all API calls | Railway backend was crashing at startup before CORS middleware could register. Root cause: Supabase `Invalid API key` — env vars in Railway were wrong (Service Role key used in SUPABASE_ANON_KEY slot) | Fixed by setting correct SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_KEY, SUPABASE_JWT_SECRET in Railway Variables dashboard. Supabase renamed the key tabs — use the **Legacy** `anon / service_role` tab which has clearly labelled keys. |
 
 ---
 
-## 12. Research Documents Reference
+## 13. Research Documents Reference
 
 All in `Research_Documents/`:
 
@@ -748,7 +775,7 @@ All in `Research_Documents/`:
 
 ---
 
-## 13. Standing AI Ethics & Integrity Rules
+## 14. Standing AI Ethics & Integrity Rules
 
 Derived from `00_S2RF_Governing_Preamble_iNHCES.pdf` (Section 6). Apply to every session and every output.
 
