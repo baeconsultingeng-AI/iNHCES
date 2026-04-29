@@ -705,7 +705,16 @@ def make_webapp(pdf):
         "estimate, SHAP bar chart (top 10 cost drivers), confidence interval, "
         "and 5-year temporal projection SVG chart in a single-page no-scroll layout. "
         "The DataSourceBadge component colour-codes every macro variable shown in the "
-        "UI (GREEN/AMBER/RED) to communicate data provenance to end users."
+        "UI (GREEN/AMBER/RED) to communicate data provenance to end users. "
+        "A dedicated Macro Context panel (Part A) is displayed on the input side of "
+        "the Estimate page, showing the seven raw macroeconomic values (CPI, GDP growth, "
+        "lending rate, Brent crude, NGN/USD/EUR/GBP) automatically fetched from the "
+        "GET /macro endpoint at page load. A Feature Snapshot panel (Part B) is "
+        "displayed on the result side after each prediction, listing all 14 derived "
+        "model inputs (first differences and percentage returns) that were fed into "
+        "the LightGBM champion model, with human-readable labels and sign-coded values. "
+        "Both panels are collapsible and designed to maximise prediction transparency "
+        "for QS professionals reviewing cost justification."
     )
     pdf.h2("7.3  System Modules Summary")
     cols = ["Module / Page", "Key Function", "Auth Required"]
@@ -713,7 +722,7 @@ def make_webapp(pdf):
     pdf.table_header(cols, widths)
     modules = [
         ("Landing (app/page.tsx)", "Hero, value proposition, data quality note, live macro snapshot", "No"),
-        ("Estimate (app/estimate/page.tsx)", "Project input form + EstimateResult + ShapChart + TemporalChart", "No (public demo)"),
+        ("Estimate (app/estimate/page.tsx)", "Project input form (A) + Macro Context panel (B) + EstimateResult + FeatureSnapshot + ShapChart + TemporalChart", "No (public demo)"),
         ("Dashboard (app/dashboard/page.tsx)", "MacroSnapshot, ModelStatus, PipelineHealth, RecentPredictions", "Yes"),
         ("Projects (app/projects/page.tsx)", "CRUD project management with cost history", "Yes"),
         ("Reports (app/reports/page.tsx)", "Generate and download PDF cost reports", "Yes"),
@@ -758,10 +767,17 @@ def make_webapp(pdf):
         "feature: enter project details, receive a cost estimate with SHAP breakdown "
         "and 5-year temporal projection.",
         [
-            "Input form: Location (6 zones), Typology (detached/semi/terrace/flat), "
+            "Input form (A. User-provided inputs): Location (6 zones), Typology, "
             "Structural System, Floor Area (m2), Number of Floors, Quality Grade",
+            "Macro Context panel (B. Macroeconomic Inputs): collapsible panel showing "
+            "7 raw macro values (CPI, GDP growth, lending rate, Brent crude, "
+            "NGN/USD/EUR/GBP) auto-fetched from GET /macro at page load with "
+            "GREEN/AMBER/RED DataSourceBadge indicating pipeline freshness",
             "EstimateResult card: cost per m2 (NGN), total project cost, "
             "confidence interval, DataSourceBadge",
+            "Feature Snapshot panel: collapsible table of all 14 derived model inputs "
+            "(first differences and % returns) actually fed to LightGBM, with "
+            "human-readable labels and sign-coded values",
             "ShapChart: horizontal bar chart showing top-10 cost drivers (SHAP values)",
             "TemporalChart: SVG line chart -- Current / <1yr / <3yr / <5yr with "
             "widening confidence band at 25%% p.a. compound inflation",
