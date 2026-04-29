@@ -30,39 +30,39 @@ RETURNS TABLE(
 )
 LANGUAGE sql STABLE SECURITY DEFINER AS $$
     -- NGN/USD exchange rate
-    SELECT 'ngn_usd'::TEXT, 'NGN/USD Exchange Rate', ngn_usd, 'NGN per USD',
+    (SELECT 'ngn_usd'::TEXT, 'NGN/USD Exchange Rate', ngn_usd, 'NGN per USD',
            date, source, data_level::TEXT
-    FROM public.macro_fx ORDER BY date DESC LIMIT 1
+    FROM public.macro_fx ORDER BY date DESC LIMIT 1)
     UNION ALL
     -- NGN/EUR exchange rate
-    SELECT 'ngn_eur', 'NGN/EUR Exchange Rate', ngn_eur, 'NGN per EUR',
+    (SELECT 'ngn_eur', 'NGN/EUR Exchange Rate', ngn_eur, 'NGN per EUR',
            date, source, data_level::TEXT
-    FROM public.macro_fx ORDER BY date DESC LIMIT 1
+    FROM public.macro_fx ORDER BY date DESC LIMIT 1)
     UNION ALL
     -- NGN/GBP exchange rate
-    SELECT 'ngn_gbp', 'NGN/GBP Exchange Rate', ngn_gbp, 'NGN per GBP',
+    (SELECT 'ngn_gbp', 'NGN/GBP Exchange Rate', ngn_gbp, 'NGN per GBP',
            date, source, data_level::TEXT
-    FROM public.macro_fx ORDER BY date DESC LIMIT 1
+    FROM public.macro_fx ORDER BY date DESC LIMIT 1)
     UNION ALL
     -- CPI inflation
-    SELECT 'cpi_annual_pct', 'CPI Inflation (Annual)', cpi_annual_pct, '% per annum',
+    (SELECT 'cpi_annual_pct', 'CPI Inflation (Annual)', cpi_annual_pct, '% per annum',
            date, source, data_level::TEXT
-    FROM public.macro_cpi ORDER BY date DESC LIMIT 1
+    FROM public.macro_cpi ORDER BY date DESC LIMIT 1)
     UNION ALL
     -- GDP growth
-    SELECT 'gdp_growth_pct', 'GDP Growth Rate', gdp_growth_pct, '% per annum',
+    (SELECT 'gdp_growth_pct', 'GDP Growth Rate', gdp_growth_pct, '% per annum',
            date, source, data_level::TEXT
-    FROM public.macro_gdp ORDER BY date DESC LIMIT 1
+    FROM public.macro_gdp ORDER BY date DESC LIMIT 1)
     UNION ALL
     -- Lending rate
-    SELECT 'lending_rate_pct', 'Lending Interest Rate', lending_rate_pct, '% per annum',
+    (SELECT 'lending_rate_pct', 'Lending Interest Rate', lending_rate_pct, '% per annum',
            date, source, data_level::TEXT
-    FROM public.macro_interest ORDER BY date DESC LIMIT 1
+    FROM public.macro_interest ORDER BY date DESC LIMIT 1)
     UNION ALL
     -- Brent crude
-    SELECT 'brent_usd_barrel', 'Brent Crude Oil Price', brent_usd_barrel, 'USD per barrel',
+    (SELECT 'brent_usd_barrel', 'Brent Crude Oil Price', brent_usd_barrel, 'USD per barrel',
            date, source, data_level::TEXT
-    FROM public.macro_oil ORDER BY date DESC LIMIT 1;
+    FROM public.macro_oil ORDER BY date DESC LIMIT 1);
 $$;
 
 COMMENT ON FUNCTION public.get_latest_macro_snapshot() IS
