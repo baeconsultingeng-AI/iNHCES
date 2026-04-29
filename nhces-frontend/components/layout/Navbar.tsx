@@ -2,16 +2,26 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import {
+  Calculator,
+  LayoutDashboard,
+  FolderOpen,
+  FileText,
+  TrendingUp,
+  LogIn,
+  LogOut,
+  UserPlus,
+} from 'lucide-react';
 import { GS, COLOURS } from '@/lib/styles';
 import { createClient, signOut, SUPABASE_CONFIGURED } from '@/lib/auth';
 import type { User } from '@supabase/supabase-js';
 
 const NAV_LINKS = [
-  { href: '/estimate',  label: 'Estimate'   },
-  { href: '/dashboard', label: 'Dashboard'  },
-  { href: '/projects',  label: 'Projects'   },
-  { href: '/reports',   label: 'Reports'    },
-  { href: '/macro',     label: 'Macro Data' },
+  { href: '/estimate',  label: 'Estimate',   Icon: Calculator      },
+  { href: '/dashboard', label: 'Dashboard',  Icon: LayoutDashboard },
+  { href: '/projects',  label: 'Projects',   Icon: FolderOpen      },
+  { href: '/reports',   label: 'Reports',    Icon: FileText        },
+  { href: '/macro',     label: 'Macro Data', Icon: TrendingUp      },
 ];
 
 export default function Navbar() {
@@ -70,14 +80,15 @@ export default function Navbar() {
       <span style={{ width: 1, height: 24, background: COLOURS.border, margin: '0 8px' }} />
 
       {/* Navigation links */}
-      {NAV_LINKS.map(({ href, label }) => {
+      {NAV_LINKS.map(({ href, label, Icon }) => {
         const active = pathname === href || pathname.startsWith(href + '/');
         return (
           <Link
             key={href}
             href={href}
-            style={{ ...GS.navBtn, ...(active ? GS.navBtnActive : {}) }}
+            style={{ ...GS.navBtn, ...(active ? GS.navBtnActive : {}), display: 'flex', alignItems: 'center', gap: 5 }}
           >
+            <Icon size={14} strokeWidth={1.8} />
             {label}
           </Link>
         );
@@ -128,21 +139,27 @@ export default function Navbar() {
               color:  COLOURS.red,
               cursor: loggingOut ? 'not-allowed' : 'pointer',
               opacity: loggingOut ? 0.6 : 1,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
             }}
           >
+            <LogOut size={14} strokeWidth={1.8} />
             {loggingOut ? 'Signing out...' : 'Log Out'}
           </button>
         </div>
       ) : (
         /* Logged out state */
         <>
-          <Link href="/login" style={GS.navBtn}>
+          <Link href="/login" style={{ ...GS.navBtn, display: 'flex', alignItems: 'center', gap: 5 }}>
+            <LogIn size={14} strokeWidth={1.8} />
             Log In
           </Link>
           <Link
             href="/register"
-            style={{ ...GS.btn, padding: '7px 16px', fontSize: 13 }}
+            style={{ ...GS.btn, padding: '7px 16px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 5 }}
           >
+            <UserPlus size={14} strokeWidth={1.8} />
             Get Started
           </Link>
         </>
