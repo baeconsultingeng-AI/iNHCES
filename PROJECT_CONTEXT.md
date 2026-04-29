@@ -1,7 +1,7 @@
 # iNHCES Project Context Document
 **Intelligent National Housing Cost Estimating System**
 TETFund NRF 2025 | Department of Quantity Surveying, ABU Zaria
-**Last updated:** 2026-04-29  |  **Session:** O6 FULLY COMPLETE + DEPLOYED + REVIEW FREEZE. GitHub: https://github.com/baeconsultingeng-AI/iNHCES (master, latest: `21bef60`). System LIVE: https://i-nhces.vercel.app | https://inhces-production.up.railway.app. Post-deployment UI improvements applied (icons, 3D logo, navbar style, estimate transparency). ⛔ REVIEW FREEZE — no further code changes until research team review complete.
+**Last updated:** 2026-04-29  |  **Session:** O6 FULLY COMPLETE + DEPLOYED + REVIEW FREEZE. GitHub: https://github.com/baeconsultingeng-AI/iNHCES (master, latest: `9167a38`). System LIVE: https://i-nhces.vercel.app | https://inhces-production.up.railway.app. Post-deployment UI improvements applied (icons, 3D logo, navbar style, estimate transparency). ⛔ REVIEW FREEZE — no further code changes until research team review complete.
 
 > **Purpose:** This document is the single source of truth for resuming development after any session interruption.
 > When starting a new session (Copilot Chat, Claude extension, or Claude Code CLI), read this file first.
@@ -703,6 +703,8 @@ iNHCES/
 | `4dbcab1` | iNHCES 3D isometric logo (house + i-dot + ascending bars) | `Logo.tsx`, `public/logo.svg`, `app/icon.svg` |
 | `b321af2` | Navbar font size +10% (14→15 px), color → accent gold `#8b6400` | `lib/styles.ts` |
 | `21bef60` | Estimate page transparency: Part A Macro Context panel + Part B Feature Snapshot panel | `app/estimate/page.tsx` |
+| `1c5d777` | CLAUDE.md + PROJECT_CONTEXT.md updated (system live, paper status, CORS issue, review freeze) | `CLAUDE.md`, `PROJECT_CONTEXT.md` |
+| `9167a38` | Macro Context panel: `maxHeight: 260px` + `overflowY: auto` — all variables now scrollable | `app/estimate/page.tsx` |
 
 ### Estimate Page Transparency Design (commit `21bef60`)
 - **Part A — Macro Context panel** (left column, below form): 7 raw macro values (CPI, GDP growth, lending rate, Brent crude, NGN/USD/EUR/GBP) auto-fetched from `GET /macro` at page load. Collapsible. DataSourceBadge (GREEN/AMBER/RED). Link to `/macro` page for updates.

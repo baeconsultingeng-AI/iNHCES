@@ -25,7 +25,7 @@ Every session is governed by the S2RF Governing Preamble:
 
 ## GitHub Repository
 https://github.com/baeconsultingeng-AI/iNHCES
-Branch: master | Latest commit: `21bef60` (April 29 2026) | CI/CD: GitHub Actions live
+Branch: master | Latest commit: `9167a38` (April 29 2026) | CI/CD: GitHub Actions live
 
 ---
 
@@ -111,6 +111,8 @@ Last confirmed healthy: `{"status":"ok","db":{"status":"ok"},"ml_model":"loaded"
 | `b321af2` | Navbar font size +10% (14→15 px), color → accent gold `#8b6400` |
 | latest | **Estimate page transparency** — Part A: Macro Context panel (7 raw macro values, collapsible, below form); Part B: Feature Snapshot panel (all 14 derived model inputs with human-readable labels, collapsible, below SHAP). No backend changes required (`feature_snapshot` was already in `EstimateResponse`). |
 | `21bef60` | P7 generator updated (transparency panels documented in Section 7.2 + 7.3); CLAUDE.md + PROJECT_CONTEXT.md updated; REVIEW FREEZE applied |
+| `1c5d777` | CLAUDE.md + PROJECT_CONTEXT.md updated: system live status, P4-P7 draft status, post-deployment UI section, CORS known issue, review freeze |
+| `9167a38` | fix: Macro Context panel grid — added `maxHeight: 260px` + `overflowY: auto` scroll so all variables are reachable |
 
 ## ⛔ REVIEW FREEZE
 All code changes are frozen pending a complete review by the research team.
