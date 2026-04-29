@@ -25,7 +25,7 @@ Every session is governed by the S2RF Governing Preamble:
 
 ## GitHub Repository
 https://github.com/baeconsultingeng-AI/iNHCES
-Branch: master | Latest commit: `e5cd2c3` (April 29 2026) | CI/CD: GitHub Actions live
+Branch: master | Latest commit: `54e8db7` (April 29 2026) | CI/CD: GitHub Actions live
 
 ---
 
@@ -115,6 +115,7 @@ Last confirmed healthy: `{"status":"ok","db":{"status":"ok"},"ml_model":"loaded"
 | `9167a38` | fix: Macro Context panel grid — added `maxHeight: 260px` + `overflowY: auto` scroll so all variables are reachable |
 | `4471682` | docs: CLAUDE.md + PROJECT_CONTEXT.md updated to reflect 9167a38 |
 | `e5cd2c3` | fix: removed `overflow:hidden` from macro panel outer wrapper — scroll now works correctly |
+| `54e8db7` | docs: CLAUDE.md + PROJECT_CONTEXT.md final update — all post-deployment commits logged, review freeze active |
 
 ## ⛔ REVIEW FREEZE
 All code changes are frozen pending a complete review by the research team.
