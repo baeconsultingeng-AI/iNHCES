@@ -173,6 +173,60 @@ class PaperPDF(DocPDF):
             x += w
         self.set_xy(LEFT, y0 + row_h)
 
+    def screen_panel(self, page_name, url_hint, workflow_step, description, elements):
+        """Draw a styled 'browser window' panel representing a UI page."""
+        if self.get_y() + 55 > (297 - 22):
+            self.add_page()
+        self.ln(2)
+        # Chrome / title bar
+        self.set_fill_color(45, 85, 45)
+        self.set_draw_color(20, 60, 20)
+        self.set_line_width(0.4)
+        bar_w = PAGE_W
+        self.set_x(LEFT)
+        self.rect(LEFT, self.get_y(), bar_w, 7, 'F')
+        self.set_font("Helvetica", "B", 7.5)
+        self.set_text_color(*WHITE)
+        y_bar = self.get_y()
+        self.set_xy(LEFT + 2, y_bar + 1)
+        self.cell(bar_w - 4, 5,
+                  sanitize(f"  [{workflow_step}]  {page_name}  |  https://i-nhces.vercel.app{url_hint}"))
+        self.ln(7)
+        # Content area
+        content_y = self.get_y()
+        self.set_fill_color(250, 248, 243)
+        self.set_draw_color(140, 110, 50)
+        self.set_line_width(0.3)
+        # Estimate content height
+        n_lines = len(elements) * 1 + 4
+        content_h = n_lines * 4.5 + 10
+        self.rect(LEFT, content_y, bar_w, content_h, 'DF')
+        self.set_xy(LEFT + 3, content_y + 2)
+        self.set_font("Helvetica", "B", 8.5)
+        self.set_text_color(*DARK_NAVY)
+        self.multi_cell(bar_w - 6, 5, sanitize(description))
+        self.ln(0.5)
+        for elem in elements:
+            self.set_x(LEFT + 6)
+            self.set_font("Helvetica", "", 8)
+            self.set_text_color(*DARK_GREY)
+            self.cell(4, 4.5, sanitize(">"))
+            self.set_x(LEFT + 10)
+            self.multi_cell(bar_w - 14, 4.5, sanitize(elem))
+        self.set_y(content_y + content_h + 1)
+        # Screenshot placeholder strip
+        self.set_fill_color(255, 245, 210)
+        self.set_draw_color(180, 120, 0)
+        self.set_line_width(0.3)
+        self.set_x(LEFT)
+        self.set_font("Helvetica", "I", 7.5)
+        self.set_text_color(120, 80, 0)
+        self.cell(bar_w, 5,
+                  sanitize(f"  [INSERT SCREENSHOT: {page_name} page -- capture from https://i-nhces.vercel.app{url_hint}]"),
+                  border=1, fill=True, ln=True)
+        self.set_text_color(*DARK_GREY)
+        self.ln(2)
+
 
 # ── TITLE PAGE ────────────────────────────────────────────────────────────────
 def make_title_page(pdf):
@@ -670,6 +724,178 @@ def make_webapp(pdf):
     for i, row in enumerate(modules):
         pdf.table_row(row, widths, fill=(i % 2 == 1))
     pdf.ln(3)
+
+    # ── 7.3 Interface Workflow ─────────────────────────────────────────────
+    pdf.add_page()
+    pdf.h2("7.3  Interface Workflow -- Page-by-Page User Journey")
+    pdf.para(
+        "iNHCES presents QS professionals with an eight-page interface covering the "
+        "full estimation workflow: from landing to estimate to dashboard to project "
+        "management and reporting. The following panels describe each page's "
+        "purpose, key UI elements, and workflow position. Screenshots should be "
+        "captured from the live deployed system at https://i-nhces.vercel.app and "
+        "inserted at each [INSERT SCREENSHOT] marker before submission."
+    )
+
+    pdf.screen_panel(
+        "Landing Page", "/",
+        "Step 1 of 8 -- Entry Point",
+        "Two-column viewport-fill layout: left column presents value proposition + "
+        "live macro snapshot badge; right column shows a live estimate preview card.",
+        [
+            "Warm Ivory background (#F5F1EB) with Playfair Display headings",
+            "Live macro snapshot: NGN/USD rate + CPI with GREEN/AMBER/RED DataSourceBadge",
+            "'Get Your Estimate' CTA button -- navigates to /estimate",
+            "Navigation bar: Logo | Estimate | Macro | Dashboard | Login",
+            "Data source transparency note: explains GREEN/AMBER/RED colour system to users",
+        ]
+    )
+
+    pdf.screen_panel(
+        "Estimate Page", "/estimate",
+        "Step 2 of 8 -- Core Estimation Workflow",
+        "Six-field project descriptor form + results panel. The primary user-facing "
+        "feature: enter project details, receive a cost estimate with SHAP breakdown "
+        "and 5-year temporal projection.",
+        [
+            "Input form: Location (6 zones), Typology (detached/semi/terrace/flat), "
+            "Structural System, Floor Area (m2), Number of Floors, Quality Grade",
+            "EstimateResult card: cost per m2 (NGN), total project cost, "
+            "confidence interval, DataSourceBadge",
+            "ShapChart: horizontal bar chart showing top-10 cost drivers (SHAP values)",
+            "TemporalChart: SVG line chart -- Current / <1yr / <3yr / <5yr with "
+            "widening confidence band at 25%% p.a. compound inflation",
+            "'Save to Projects' button -- requires login",
+        ]
+    )
+
+    pdf.screen_panel(
+        "Dashboard", "/dashboard",
+        "Step 3 of 8 -- Researcher Overview (Auth Required)",
+        "Six-stat pill row + three-column grid. Provides authenticated researchers "
+        "and QS professionals with a real-time overview of macro conditions, "
+        "model status, and pipeline health.",
+        [
+            "Stat pills: Total Projects | Estimates Today | Active Users | "
+            "Model MAPE | Last Retrain | Pipeline Status",
+            "MacroSnapshot column: live NGN/USD, CPI, Brent with DataSourceBadge",
+            "ModelStatus column: champion MAPE, last trained date, drift PSI",
+            "PipelineHealth column: DAG run status, last ingestion time, "
+            "next scheduled retrain",
+            "RecentPredictions table: last 10 estimates with cost/location/date",
+        ]
+    )
+
+    pdf.screen_panel(
+        "Projects Page", "/projects",
+        "Step 4 of 8 -- Project Portfolio Management (Auth Required)",
+        "Full CRUD project management. QS professionals maintain a portfolio of "
+        "project cost estimates, with history tracking to observe how estimates "
+        "change over time as macroeconomic conditions shift.",
+        [
+            "Project list: cards showing project name, location, typology, "
+            "latest estimate, date created",
+            "New Project modal: same 6-field form as Estimate page",
+            "Project detail: full estimate history chart (cost per m2 over time)",
+            "Edit / Delete project controls",
+            "Export to CSV button for cost history data",
+        ]
+    )
+
+    pdf.screen_panel(
+        "Reports Page", "/reports",
+        "Step 5 of 8 -- PDF Report Generation (Auth Required)",
+        "Generate and download professional 4-page PDF cost reports for client "
+        "submission. Reports are stored in Cloudflare R2 and linked to the "
+        "user account via the Supabase reports table.",
+        [
+            "Report list: previous reports with download links",
+            "Generate Report button: creates a 4-page fpdf2 PDF with "
+            "project details, estimate, SHAP chart, temporal projection, "
+            "and DATA SOURCE declaration",
+            "Report preview card: title, date, project name, cost summary",
+            "Download button: fetches signed R2 URL for PDF download",
+            "Report status: PENDING -> GENERATING -> READY (with polling)",
+        ]
+    )
+
+    pdf.screen_panel(
+        "Macro Data Page", "/macro",
+        "Step 6 of 8 -- Macroeconomic Data Explorer (Public)",
+        "Historical time series charts for all 7 macroeconomic variables. "
+        "Public-access page allowing any user to understand the economic context "
+        "driving Nigerian housing construction costs.",
+        [
+            "Variable selector: NGN/USD | NGN/EUR | NGN/GBP | CPI | GDP Growth | "
+            "Lending Rate | Brent Crude",
+            "Time range selector: 1yr | 3yr | 5yr | 10yr",
+            "Line chart: historical series with DataSourceBadge (GREEN/AMBER/RED)",
+            "Latest value card: current value + % change from 1yr ago",
+            "Trend note: AI-generated contextual explanation of the trend (AMBER badge)",
+        ]
+    )
+
+    pdf.screen_panel(
+        "Login / Register Pages", "/login and /register",
+        "Step 7 of 8 -- Authentication (Supabase GoTrue)",
+        "Supabase GoTrue JWT authentication. Clean single-column forms "
+        "matching the Warm Ivory design system.",
+        [
+            "Login: email + password fields, 'Forgot password' link, "
+            "'Register' link",
+            "Register: name + email + password + role selection "
+            "(QS Professional / Researcher / Admin)",
+            "On success: JWT stored in httpOnly cookie; redirect to /dashboard",
+            "Error states: invalid credentials, email not verified, "
+            "password too weak",
+            "Protected route redirect: unauthenticated access to /dashboard, "
+            "/projects, /reports redirects to /login",
+        ]
+    )
+
+    # ── 7.4 Deployment Architecture ───────────────────────────────────────
+    pdf.h2("7.4  Live Deployment Architecture")
+    pdf.para(
+        "iNHCES is fully deployed and accessible at production URLs. "
+        "The deployment is cloud-native, serverless where possible, and "
+        "achieves a total infrastructure cost of approximately USD 15-25/month."
+    )
+    cols2 = ["Component", "Platform", "Live URL / Reference", "Notes"]
+    widths2 = [30, 22, 70, 64]
+    pdf.table_header(cols2, widths2)
+    deploy_rows = [
+        ("Next.js Frontend", "Vercel",
+         "https://i-nhces.vercel.app",
+         "Serverless, auto-deploys on git push to master"),
+        ("FastAPI Backend", "Railway",
+         "https://inhces-production.up.railway.app",
+         "Dockerised; 512 MB; root dir: /nhces-backend"),
+        ("Health endpoint", "Railway",
+         "https://inhces-production.up.railway.app/health",
+         "Returns {status, db.status, ml_model}"),
+        ("API Docs", "Railway",
+         "https://inhces-production.up.railway.app/docs",
+         "FastAPI auto-generated Swagger UI"),
+        ("Database", "Supabase",
+         "https://<ref>.supabase.co",
+         "PostgreSQL 16, 16 tables, RLS, JWT auth"),
+        ("Model Storage", "Cloudflare R2",
+         "nhces-storage bucket",
+         "champion_model.pkl + generated PDF reports"),
+        ("CI/CD", "GitHub Actions",
+         "github.com/baeconsultingeng-AI/iNHCES",
+         "Auto-deploy on push to master branch"),
+    ]
+    for i, row in enumerate(deploy_rows):
+        pdf.table_row(row, widths2, fill=(i % 2 == 1))
+    pdf.ln(3)
+    pdf.contrib_box(
+        "Deployment outcome: iNHCES achieved production deployment on 29 April 2026. "
+        "The /health endpoint confirms: {'status': 'ok', 'db': {'status': 'ok'}, "
+        "'ml_model': 'loaded'}. The system is accessible to practising QS professionals "
+        "via https://i-nhces.vercel.app at zero cost to end users. All 17 API routes "
+        "are operational. CORS is configured for the Vercel production origin."
+    )
 
 
 # ── SECTION 8: VALIDATION ─────────────────────────────────────────────────────

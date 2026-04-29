@@ -506,20 +506,23 @@ def section3(pdf):
     scale_data = [
         ("Python analysis / generator scripts", "~68"),
         ("TypeScript / React frontend files (Next.js 14)", "~30"),
-        ("PDF documents (research outputs)", "~55"),
+        ("PDF documents (research outputs)", "~57"),
         ("CSV datasets (raw, processed, results, ML)", "~15"),
         ("Markdown documents (SRS, use cases, Delphi, chapters)", "16"),
         ("SQL files (schema, RLS, seed, functions, indexes, verification)", "6"),
         ("Mermaid diagram files (.mmd)", "5"),
         ("Airflow DAG files (Python)", "7"),
-        ("Deployment / CI-CD config files", "4"),
+        ("Deployment / CI-CD config files (Dockerfile, railway.toml, deploy.yml)", "4"),
         ("Publication-quality PNG diagrams (matplotlib)", "6"),
         ("ML model artefacts (.pkl champion model)", "1"),
-        ("Draft papers generated (P1-P6, P9)", "7"),
-        ("Total lines of AI-assisted code (Python + TypeScript, approx.)", "~50,000"),
-        ("Total PDF pages generated (O1-O6 + papers)", "~620"),
-        ("Estimated equivalent researcher-hours (manual)", "~1,000-1,400 hours"),
-        ("Actual elapsed time (AI-assisted, O1-O6)", "~48 hours across ~20 sessions"),
+        ("Draft papers generated (P1-P9, all complete)", "9"),
+        ("GitHub commits (version-controlled from first push)", "~15"),
+        ("Total files pushed to GitHub (O1-O6 + papers)", "227"),
+        ("Production deployments (Railway + Vercel)", "2"),
+        ("Total lines of AI-assisted code (Python + TypeScript, approx.)", "~55,000"),
+        ("Total PDF pages generated (O1-O6 + papers)", "~640"),
+        ("Estimated equivalent researcher-hours (manual)", "~1,100-1,500 hours"),
+        ("Actual elapsed time (AI-assisted, O1-O6 + deployment)", "~52 hours across ~22 sessions"),
     ]
     sv2 = [PAGE_W - 30, 30]
     pdf.thead(["Output Type", "Count"], sv2)
@@ -827,6 +830,150 @@ def section5(pdf):
         "AI-assisted postgraduate research project."
     )
 
+    pdf.h2("5.7 O6 -- Full System Implementation and Deployment to Production")
+    pdf.para(
+        "Objective O6 was the most technically demanding objective in the iNHCES "
+        "simulation: building, testing, and deploying a full-stack web application "
+        "using FastAPI (backend) + Next.js 14 (frontend) + Supabase (database) + "
+        "Cloudflare R2 (storage) + Apache Airflow (pipeline orchestration). "
+        "O6 required 15 sequential AI-assisted sessions (S1-S15) and produced "
+        "the live production system accessible at https://i-nhces.vercel.app. "
+        "This is the most comprehensive application of the S2RF to engineering "
+        "work and demonstrates the framework's utility beyond purely "
+        "research-document generation."
+    )
+    pdf.para(
+        "The 15 O6 sessions and their S2RF data classifications are summarised below:"
+    )
+    s6v = [10, 28, 22, PAGE_W - 60]
+    pdf.thead(["S#", "Agent / Focus", "DATA SOURCE", "Key Deliverables and S2RF Decisions"], s6v)
+    s6rows = [
+        ("S1", "Backend Core",   "AMBER",
+         "main.py, config.py, database.py, auth.py, requirements.txt. "
+         "AMBER: real architecture decisions; settings validated against Pydantic models."),
+        ("S2", "ML Inference",   "AMBER/RED",
+         "app/ml/inference.py + feature_prep.py + explainer.py. "
+         "AMBER: LightGBM/SHAP pipeline design. RED: champion_model.pkl trained on synthetic data."),
+        ("S3", "Estimate Route", "AMBER/RED",
+         "POST /estimate: 4-horizon temporal projection + SHAP explanation. "
+         "AMBER: API design. RED: model predictions use synthetic champion model."),
+        ("S4", "API Routes",     "AMBER",
+         "17 routes across 5 routers. GET /macro + /history, CRUD /projects, "
+         "POST/GET /reports, GET /pipeline. S2RF decision: public vs auth-required routes."),
+        ("S5", "Storage + PDF",  "AMBER",
+         "r2_storage.py + report_generator.py (fpdf2 4-page PDF) + pipeline_monitor.py. "
+         "DATA SOURCE banner carried through to generated PDF reports."),
+        ("S6", "Frontend GDS",   "AMBER",
+         "Warm Ivory (#F5F1EB) design system: Playfair Display + Lora + DM Sans. "
+         "All UI components, Navbar, layout. Design system is real, citable."),
+        ("S7", "Estimate UI",    "AMBER",
+         "Landing page (2-col viewport-fill) + Estimate page with TemporalChart SVG. "
+         "AMBER: component design. RED: displayed values come from synthetic model."),
+        ("S8", "Dashboard UI",   "AMBER",
+         "6-stat pills + 3-col grid: MacroSnapshot / ModelStatus / PipelineHealth. "
+         "Real component architecture; displayed data depends on production DB."),
+        ("S9", "Data Pages",     "AMBER",
+         "Projects + Reports + Macro pages with DataSourceBadge component. "
+         "S2RF innovation: DataSourceBadge propagates GREEN/AMBER/RED to end users."),
+        ("S10", "Auth UI",       "AMBER",
+         "Login + Register pages + Navbar auth state using Supabase GoTrue JWT. "
+         "Real authentication architecture with no synthetic components."),
+        ("S11", "Database",      "AMBER/RED",
+         "04_db_functions.sql (5 fns) + 04_db_indexes.sql (14 idx) + "
+         "04_db_verification.sql. RED: seed data is synthetic. Schema is AMBER (real)."),
+        ("S12", "QA + Testing",  "AMBER",
+         "73 pytest assertions passing; code review checklist. "
+         "S2RF note: tests validate system against synthetic data -- must be re-run on real data."),
+        ("S13", "API Docs",      "AMBER",
+         "O6_13_API_Documentation.pdf (13pp, all 17 endpoints documented). "
+         "Real API documentation; publishable as-is."),
+        ("S14", "DevOps",        "AMBER",
+         "Dockerfile + railway.toml + deploy.yml + 6 Airflow DAGs + "
+         "O6_14_Deployment_Guide.pdf. Real CI/CD configuration."),
+        ("S15", "Deploy Guide",  "AMBER",
+         "O6_15_Step_By_Step_Deployment.pdf (14pp, 6-phase beginner guide). "
+         "Real deployment instructions tested against live Railway + Vercel deployment."),
+    ]
+    for i, row in enumerate(s6rows):
+        pdf.mrow(list(row), s6v, fill=(i % 2 == 1))
+    pdf.set_font("Helvetica", "I", 8)
+    pdf.set_text_color(*MID_GREY)
+    pdf.set_x(LEFT)
+    pdf.multi_cell(PAGE_W, 4.5, sanitize(
+        "Table O6: iNHCES O6 session log -- 15 sessions, FastAPI + Next.js full-stack system. "
+        "All AMBER outputs are real engineering deliverables. RED items require real data."
+    ))
+    pdf.set_text_color(*DARK_GREY)
+    pdf.ln(2)
+
+    pdf.h3("5.7.1  S2RF Decisions Specific to Engineering and Deployment")
+    pdf.bullet_list([
+        "CORS configuration (AMBER): the ALLOWED_ORIGINS environment variable pattern "
+        "-- splitting a comma-separated string in Settings.origins_list() -- is a real, "
+        "publishable architectural decision. The specific value (https://i-nhces.vercel.app) "
+        "is real production data once the system is deployed.",
+        "Supabase FK ordering in seed data (discovered during deployment): the "
+        "public.users table has a foreign key to auth.users (Supabase's internal user "
+        "table). The seed data script initially inserted public.users before auth.users "
+        "existed, causing a PostgreSQL FK constraint violation. The S2RF required "
+        "documenting this error in the Known Issues log and applying a targeted fix "
+        "(insert into auth.users first with all required GoTrue columns). This kind of "
+        "real deployment debugging experience -- documented in the session log -- is "
+        "itself a pedagogically valuable S2RF output.",
+        "Railway $PORT variable expansion (discovered during deployment): the Railway "
+        "startCommand uses Dockerfile exec form, which does not expand shell variables. "
+        "Wrapping the command in /bin/sh -c '...' was required. This is a real-world "
+        "DevOps debugging lesson documented in the S2RF session record.",
+        "NEXT_PUBLIC_ prefix requirement in Next.js (discovered during deployment): "
+        "environment variables in Next.js are only available in the browser bundle "
+        "if they are prefixed with NEXT_PUBLIC_. The NEXT_PUBLIC_API_URL variable must "
+        "be set in the Vercel dashboard before build time -- setting it after deployment "
+        "has no effect on already-built bundles. This is a non-obvious Next.js "
+        "behaviour documented here for other researchers using this stack.",
+        "GitHub branch naming (real): the repository uses 'master' (not 'main') as the "
+        "default branch, because git init on the researcher's machine created 'master'. "
+        "The CI/CD pipeline in deploy.yml is configured for master branch triggers. "
+        "This is a real, version-controlled artefact.",
+    ])
+
+    pdf.h3("5.7.2  Deployment Outcome -- Production System Status")
+    pdf.para(
+        "iNHCES reached full production deployment on 29 April 2026. "
+        "The deployment sequence followed the 6-phase plan in "
+        "O6_15_Step_By_Step_Deployment.pdf:"
+    )
+    pdf.numbered_list([
+        "Phase 1 -- GitHub: 227 files pushed to "
+        "https://github.com/baeconsultingeng-AI/iNHCES (branch: master). "
+        "DATA SOURCE: GREEN (real version-controlled repository).",
+        "Phase 2 -- Supabase: project created, 4 SQL files executed "
+        "(schema, RLS, seed data, functions). 16 tables, 7 enum types, "
+        "36 RLS policies active. DATA SOURCE: AMBER for schema; RED for seed data.",
+        "Phase 3 -- Cloudflare R2: bucket nhces-storage created; "
+        "champion_model.pkl uploaded. DATA SOURCE: RED (synthetic model).",
+        "Phase 4 -- Railway: backend Dockerised and deployed at "
+        "https://inhces-production.up.railway.app. Health check: "
+        "{status: ok, db: {status: ok}, ml_model: loaded}. "
+        "DATA SOURCE: AMBER (real infrastructure, synthetic model).",
+        "Phase 5 -- Vercel: Next.js frontend deployed at https://i-nhces.vercel.app. "
+        "NEXT_PUBLIC_API_URL set to Railway URL; CORS configured. "
+        "DATA SOURCE: AMBER.",
+        "Phase 6 -- GitHub Actions: 5 secrets configured; CI/CD pipeline live. "
+        "Auto-deploy triggered on every git push to master. DATA SOURCE: AMBER.",
+    ])
+    pdf.key_finding_box(
+        "S2RF CASE STUDY FINDING -- DEPLOYMENT DEBUGGING AS PEDAGOGY",
+        "The O6 deployment phase surfaced four real engineering errors: (1) Railway "
+        "monorepo root directory misconfiguration; (2) shell variable non-expansion in "
+        "Dockerfile exec form; (3) CORS origin mismatch between Railway and Vercel; "
+        "(4) Supabase FK constraint violation in seed data. Each error was diagnosed "
+        "from live error messages, fixed, committed, and documented. This debugging "
+        "record -- preserved in the Git commit history -- is itself an S2RF output: "
+        "a transparent, auditable account of the gap between AI-simulated design and "
+        "real deployment reality. For postgraduate students, this gap is the most "
+        "instructive part of the simulation-to-real pipeline."
+    )
+
 
 # ── Section 6: Ethics and Integrity Compliance ────────────────────────────────
 def section6(pdf):
@@ -1084,9 +1231,10 @@ def section9(pdf):
     ])
     pdf.para(
         "The S2RF enables a full six-objective, nine-paper research programme "
-        "to be simulated in approximately 48 hours of AI-assisted work -- "
-        "producing ~55 PDFs, ~15 CSVs, ~30 TypeScript/React frontend files, "
-        "and ~50,000 lines of AI-assisted Python and TypeScript code -- "
+        "to be simulated in approximately 52 hours of AI-assisted work -- "
+        "producing ~57 PDFs, ~15 CSVs, ~30 TypeScript/React frontend files, "
+        "and ~55,000 lines of AI-assisted Python and TypeScript code, "
+        "culminating in a live production web system at https://i-nhces.vercel.app -- "
         "while maintaining full transparency about what is real, what is "
         "AI-generated, and what is synthetic. The gap between simulation and "
         "publication is not hidden; it is made visible, labelled, and made "
