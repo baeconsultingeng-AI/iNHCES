@@ -13,6 +13,7 @@ import {
   UserPlus,
 } from 'lucide-react';
 import { GS, COLOURS } from '@/lib/styles';
+import Logo from '@/components/ui/Logo';
 import { createClient, signOut, SUPABASE_CONFIGURED } from '@/lib/auth';
 import type { User } from '@supabase/supabase-js';
 
@@ -72,8 +73,8 @@ export default function Navbar() {
   return (
     <nav style={GS.navBar}>
       {/* Brand */}
-      <Link href="/" style={GS.navBrand}>
-        iNHCES
+      <Link href="/" style={{ ...GS.navBrand, display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+        <Logo size={28} textSize={18} />
       </Link>
 
       {/* Divider */}
