@@ -25,12 +25,43 @@
 
 -- ---------------------------------------------------------------------------
 -- TEST USER PROFILES
--- NOTE: In Supabase, users must exist in auth.users before public.users.
--- In production, the handle_new_user trigger creates these automatically.
--- For seeding, insert directly into public.users (requires service_role).
--- Replace these UUIDs with real auth.users IDs after creating test accounts
--- in the Supabase Auth dashboard.
+-- Step 1: Insert into auth.users first (required by FK constraint).
+-- Step 2: public.users is then populated (trigger or manual insert below).
+-- Requires service_role privileges in the Supabase SQL editor.
 -- ---------------------------------------------------------------------------
+
+-- Step 1: seed auth.users
+INSERT INTO auth.users (
+    id, email, encrypted_password,
+    email_confirmed_at, created_at, updated_at,
+    raw_app_meta_data, raw_user_meta_data,
+    aud, role, confirmation_token, recovery_token,
+    is_super_admin
+) VALUES
+    ('00000000-0000-0000-0000-000000000001',
+     'qs.professional@test.nhces.ng',
+     crypt('TestPassword123!', gen_salt('bf')),
+     NOW(), NOW(), NOW(),
+     '{"provider":"email","providers":["email"]}'::jsonb,
+     '{"full_name":"Aisha Bello (Test QS)"}'::jsonb,
+     'authenticated', 'authenticated', '', '', FALSE),
+    ('00000000-0000-0000-0000-000000000002',
+     'researcher@test.nhces.ng',
+     crypt('TestPassword123!', gen_salt('bf')),
+     NOW(), NOW(), NOW(),
+     '{"provider":"email","providers":["email"]}'::jsonb,
+     '{"full_name":"Dr. Ibrahim Yusuf (Test Researcher)"}'::jsonb,
+     'authenticated', 'authenticated', '', '', FALSE),
+    ('00000000-0000-0000-0000-000000000003',
+     'admin@test.nhces.ng',
+     crypt('TestPassword123!', gen_salt('bf')),
+     NOW(), NOW(), NOW(),
+     '{"provider":"email","providers":["email"]}'::jsonb,
+     '{"full_name":"Prof. Musa Abdullahi (Test Admin)"}'::jsonb,
+     'authenticated', 'authenticated', '', '', FALSE)
+ON CONFLICT (id) DO NOTHING;
+
+-- Step 2: seed public.users (FK to auth.users now satisfied)
 INSERT INTO public.users (id, email, full_name, role, institution) VALUES
     ('00000000-0000-0000-0000-000000000001',
      'qs.professional@test.nhces.ng',
